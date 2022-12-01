@@ -7,6 +7,11 @@
       return GetSumOfBlock(blocks).Max();
     }
 
+    internal static int GetSumOfTopThree(string blocks)
+    {
+      return GetSumOfBlock(blocks).OrderByDescending(x => x).Take(3).Sum();
+    }
+
     internal static IEnumerable<int> GetSumOfBlock(string block)
     {
       int? sum = null;
