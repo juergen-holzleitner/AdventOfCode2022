@@ -2,15 +2,34 @@
 {
   internal class CalorieCounting
   {
-    internal static int GetSumOfBlock(string block)
+    internal static int GetMaxSumOfBlock(string blocks)
     {
-      int sum = 0;
+      return GetSumOfBlock(blocks).Max();
+    }
+
+    internal static IEnumerable<int> GetSumOfBlock(string block)
+    {
+      int? sum = null;
       foreach (var line in block.Split('\n'))
       {
+        if (string.IsNullOrWhiteSpace(line))
+        {
+          if (sum.HasValue)
+          {
+            yield return sum.Value;
+          }
+          sum = null;
+          continue;
+        }
+
         var val = int.Parse(line.Trim());
-        sum += val;
+        sum = (sum ?? 0) + val;
       }
-      return sum;
+
+      if (sum.HasValue)
+      {
+        yield return sum.Value;
+      }
     }
   }
 }
