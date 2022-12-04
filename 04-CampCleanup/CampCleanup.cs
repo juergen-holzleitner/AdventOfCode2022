@@ -8,7 +8,13 @@ namespace _04_CampCleanup
 {
   internal static class CampCleanup
   {
-    internal record struct Assignment(int From, int To);
+    internal record struct Assignment(int From, int To)
+    {
+      internal bool IsOverlapping(Assignment second)
+      {
+        return !(second.From > To || second.To < From); 
+      }
+    }
 
     internal static Assignment ParseAssignment(string input)
     {
@@ -36,6 +42,17 @@ namespace _04_CampCleanup
     internal static int CountFullyOverlapping(IEnumerable<string> assignmentPairs)
     {
       return assignmentPairs.Count(a => AssignmentIsContained(a));
+    }
+
+    internal static bool AssignmentIsOverlapping(string input)
+    {
+      var assignmentPair = ParseAssignmentPair(input);
+      return assignmentPair.First.IsOverlapping(assignmentPair.Second);
+    }
+
+    internal static int CountOverlapping(IEnumerable<string> assignmentPairs)
+    {
+      return assignmentPairs.Count(a => AssignmentIsOverlapping(a));
     }
   }
 }

@@ -51,5 +51,21 @@ namespace _04_CampCleanup
       var numFullyOverlapping = CampCleanup.CountFullyOverlapping(input.Split('\n'));
       numFullyOverlapping.Should().Be(2);
     }
+
+    [Fact]
+    public void Can_check_if_assignments_overlap()
+    {
+      string input = "5-7,7-9";
+      var res = CampCleanup.AssignmentIsOverlapping(input);
+      res.Should().BeTrue();
+    }
+
+    [Fact]
+    public void Can_get_count_overlapping()
+    {
+      var input = "2-4,6-8\r\n2-3,4-5\r\n5-7,7-9\r\n2-8,3-7\r\n6-6,4-6\r\n2-6,4-8";
+      var numFullyOverlapping = CampCleanup.CountOverlapping(input.Split('\n'));
+      numFullyOverlapping.Should().Be(4);
+    }
   }
 }
