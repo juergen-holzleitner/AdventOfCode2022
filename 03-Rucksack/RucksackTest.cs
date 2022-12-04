@@ -48,5 +48,22 @@ namespace _03_Rucksack
       var sum = Rucksack.GetSumOfPriorities(input.Split('\n'));
       sum.Should().Be(157);
     }
+
+    [Theory]
+    [InlineData("vJrwpWtwJgWrhcsFMMfFFhFp\r\njqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL\r\nPmmdzqPrVvPwwTWBwg", 'r')]
+    [InlineData("wMqvLMZHhHMvwLHjbvcjnnSBnvTQFn\r\nttgJtRGJQctTZtZT\r\nCrZsJsPPZsGzwwsLwLmpwMDw", 'Z')]
+    public void Can_get_common_item_of_group(string input, char expectedItem)
+    {
+      var item = Rucksack.GetCommonGroupItem(input.Split('\n'));
+      item.Should().Be(expectedItem);
+    }
+
+    [Fact]
+    public void Can_get_sum_of_group_items()
+    {
+      var input = "vJrwpWtwJgWrhcsFMMfFFhFp\r\njqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL\r\nPmmdzqPrVvPwwTWBwg\r\nwMqvLMZHhHMvwLHjbvcjnnSBnvTQFn\r\nttgJtRGJQctTZtZT\r\nCrZsJsPPZsGzwwsLwLmpwMDw";
+      var sum = Rucksack.GetSumOfGroupItems(input.Split('\n'));
+      sum.Should().Be(70);
+    }
   }
 }

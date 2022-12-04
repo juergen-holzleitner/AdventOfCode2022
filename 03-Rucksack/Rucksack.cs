@@ -1,6 +1,6 @@
 ﻿namespace _03_Rucksack
 {
-  internal class Rucksack
+  internal static class Rucksack
   {
     internal record struct Compartment(IEnumerable<char> CompartmentOne, IEnumerable<char> CompartmentTwo);
 
@@ -27,6 +27,37 @@
     internal static int GetSumOfPriorities(IEnumerable<string> rucksacks)
     {
       return rucksacks.Sum(x => GetItemPriority(GetCommonItem(x)));
+    }
+
+    internal static char GetCommonGroupItem(IEnumerable<string> rucksacks)
+    {
+      return rucksacks.Select(r => r.Trim()).Aggregate<IEnumerable<char>>((prev, next) => prev.Intersect(next)).Single();
+    }
+
+    internal static int GetSumOfGroupItems(IEnumerable<string> rucksacks)
+    {
+      return rucksacks.Batch(3).Sum(b => GetItemPriority(GetCommonGroupItem(b)));
+    }
+
+    private static IEnumerable<IEnumerable<T>> Batch<T>(this IEnumerable<T> enumerator, int batchsize)
+    {
+      T[]? batch = null;
+      var count = 0;
+      foreach (var item in enumerator)
+      {
+        batch ??= new T[batchsize];
+
+        batch[count++] = item;
+        if (count < batchsize)
+          continue;
+
+        yield return batch;
+        batch = null;
+        count = 0;
+      }
+
+      if (batch is not null)
+        yield return batch.Take(count).ToArray();
     }
   }
 }
