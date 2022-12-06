@@ -98,5 +98,23 @@ namespace _05_SupplyStacks
       result.Should().Be("CMZ");
     }
 
+    [Fact]
+    public void Can_get_final_stack_part_2()
+    {
+      var input = "    [D]    \r\n[N] [C]    \r\n[Z] [M] [P]\r\n 1   2   3 \r\n\r\nmove 1 from 2 to 1\r\nmove 3 from 1 to 3\r\nmove 2 from 2 to 1\r\nmove 1 from 1 to 2";
+      var stack = SupplyStack.ProcessInputPart2(input);
+      stack[0].Should().BeEquivalentTo(new char[] { 'M' });
+      stack[1].Should().BeEquivalentTo(new char[] { 'C' });
+      stack[2].Should().BeEquivalentTo(new char[] { 'P', 'Z', 'N', 'D' });
+    }
+
+    [Fact]
+    public void Can_get_final_result_part_2()
+    {
+      var input = "    [D]    \r\n[N] [C]    \r\n[Z] [M] [P]\r\n 1   2   3 \r\n\r\nmove 1 from 2 to 1\r\nmove 3 from 1 to 3\r\nmove 2 from 2 to 1\r\nmove 1 from 1 to 2";
+      var result = SupplyStack.GetFinalResultPart2(input);
+      result.Should().Be("MCD");
+    }
+
   }
 }

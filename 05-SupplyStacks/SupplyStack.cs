@@ -130,5 +130,51 @@ namespace _05_SupplyStacks
       }
       return sb.ToString();
     }
+
+    internal static Stack<char>[] ProcessInputPart2(string input)
+    {
+      var stacks = ParseInitialStack(input);
+
+      bool separatorFound = false;
+      foreach (var line in input.Split('\n'))
+      {
+        if (!separatorFound)
+        {
+          if (!IsSeparatorLine(line))
+            continue;
+
+          separatorFound = true;
+          continue;
+        }
+
+        if (string.IsNullOrWhiteSpace(line))
+          continue;
+
+        var instruction = ParseInstruction(line);
+        var s = new Stack<char>();
+        for (int n = 0; n < instruction.Num; ++n)
+        {
+          s.Push(stacks[instruction.From - 1].Pop());
+        }
+        for (int n = 0; n < instruction.Num; ++n)
+        {
+          stacks[instruction.To - 1].Push(s.Pop());
+        }
+      }
+
+      return stacks;
+    }
+
+    internal static string GetFinalResultPart2(string input)
+    {
+      var stacks = ProcessInputPart2(input);
+      var sb = new StringBuilder();
+      for (int n = 0; n < stacks.Length; ++n)
+      {
+        if (stacks[n].TryPop(out char supply))
+          sb.Append(supply);
+      }
+      return sb.ToString();
+    }
   }
 }
