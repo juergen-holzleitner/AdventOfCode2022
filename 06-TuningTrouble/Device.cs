@@ -4,18 +4,22 @@ namespace _06_TuningTrouble
 {
   internal class Device
   {
+    internal Device(int numCharsToCheck = 4)
+    {
+      this.numCharsTocheck = numCharsToCheck;
+    }
+
     StringBuilder state = new StringBuilder();
     int count = 0;
+    private readonly int numCharsTocheck;
 
     internal void AddChar(char c)
     {
-      const int numCharsToKeep = 4;
-
       state.Append(c);
       ++count;
 
-      if (state.Length > numCharsToKeep)
-        state.Remove(0, state.Length - numCharsToKeep);
+      if (state.Length > numCharsTocheck)
+        state.Remove(0, state.Length - numCharsTocheck);
     }
 
     internal int GetCount()
@@ -30,7 +34,7 @@ namespace _06_TuningTrouble
 
     internal bool IsStartSequence()
     {
-      if (state.Length < 4)
+      if (state.Length < numCharsTocheck)
         return false;
 
       for (int n = 0; n < state.Length; ++n)
@@ -53,6 +57,18 @@ namespace _06_TuningTrouble
           return device.GetCount();
       }
       throw new ApplicationException("no startpos found");
+    }
+
+    internal static int GetMessagePos(string input)
+    {
+      var device = new Device(14);
+      foreach (var c in input)
+      {
+        device.AddChar(c);
+        if (device.IsStartSequence())
+          return device.GetCount();
+      }
+      throw new ApplicationException("no messagepos found");
     }
 
   }

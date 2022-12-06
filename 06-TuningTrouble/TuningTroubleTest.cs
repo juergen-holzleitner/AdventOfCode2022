@@ -74,9 +74,22 @@ namespace _06_TuningTrouble
     [InlineData("nppdvjthqldpwncqszvftbrmjlhg", 6)]
     [InlineData("nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg", 10)]
     [InlineData("zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw", 11)]
-    public void Can_process_intpu(string input, int expectedStartPos)
+    public void Can_get_start_pos(string input, int expectedStartPos)
     {
       var startPos = Device.GetStartPos(input);
+
+      startPos.Should().Be(expectedStartPos);
+    }
+
+    [Theory]
+    [InlineData("mjqjpqmgbljsphdztnvjfqwrcgsmlb", 19)]
+    [InlineData("bvwbjplbgvbhsrlpgdmjqwftvncz", 23)]
+    [InlineData("nppdvjthqldpwncqszvftbrmjlhg", 23)]
+    [InlineData("nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg", 29)]
+    [InlineData("zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw", 26)]
+    public void Can_get_message_pos(string input, int expectedStartPos)
+    {
+      var startPos = Device.GetMessagePos(input);
 
       startPos.Should().Be(expectedStartPos);
     }
