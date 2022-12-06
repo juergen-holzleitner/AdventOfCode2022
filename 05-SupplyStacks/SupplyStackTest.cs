@@ -18,7 +18,7 @@ namespace _05_SupplyStacks
     {
       var input = "[N] [C]";
       var supplies = SupplyStack.ParseLine(input);
-      supplies.Should().BeEquivalentTo(new char[] { 'N', 'C'});
+      supplies.Should().BeEquivalentTo(new char[] { 'N', 'C' });
     }
 
     [Theory]
@@ -48,7 +48,7 @@ namespace _05_SupplyStacks
       var input = "    [D]    \r\n[N] [C]    \r\n[Z] [M] [P]\r\n 1   2   3";
 
       var lines = SupplyStack.GetLinesUntilSeparator(input);
-      
+
       lines.Should().BeEquivalentTo(new string[] { "    [D]    ", "[N] [C]    ", "[Z] [M] [P]" });
     }
 

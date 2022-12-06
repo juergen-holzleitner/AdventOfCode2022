@@ -121,7 +121,7 @@ namespace _02_RockPaperScissors
       var gameInput = "A Y";
 
       var score = RockPaperScissors.GetRoundScore(gameInput);
-      
+
       score.Should().Be(8);
     }
 

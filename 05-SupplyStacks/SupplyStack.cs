@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace _05_SupplyStacks
 {
@@ -29,7 +25,7 @@ namespace _05_SupplyStacks
     {
       foreach (var line in input.Split('\n'))
       {
-        if (IsSeparatorLine(line)) 
+        if (IsSeparatorLine(line))
           yield break;
         yield return line.Trim('\r');
       }
@@ -63,7 +59,7 @@ namespace _05_SupplyStacks
     internal static char? GetSupplyAt(string line, int position)
     {
       var charPos = position * 4 + 1;
-      if (charPos - 1 < 0 || charPos + 1 >= line.Length) 
+      if (charPos - 1 < 0 || charPos + 1 >= line.Length)
         return null;
       if (line[charPos - 1] != '[')
         return null;

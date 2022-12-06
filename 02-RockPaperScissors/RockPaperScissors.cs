@@ -115,7 +115,7 @@
 
     internal static int GetScoreFromOutcome(Outcome gameOutcome)
     {
-      return gameOutcome switch 
+      return gameOutcome switch
       {
         Outcome.Lose => 0,
         Outcome.Draw => 3,

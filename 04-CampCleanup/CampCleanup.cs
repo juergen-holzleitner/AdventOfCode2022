@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace _04_CampCleanup
+﻿namespace _04_CampCleanup
 {
   internal static class CampCleanup
   {
@@ -12,7 +6,7 @@ namespace _04_CampCleanup
     {
       internal bool IsOverlapping(Assignment second)
       {
-        return !(second.From > To || second.To < From); 
+        return !(second.From > To || second.To < From);
       }
     }
 

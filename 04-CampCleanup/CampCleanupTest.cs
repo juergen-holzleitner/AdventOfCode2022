@@ -27,7 +27,7 @@ namespace _04_CampCleanup
     {
       var assignment1 = new CampCleanup.Assignment(2, 8);
       var assignment2 = new CampCleanup.Assignment(3, 7);
-      
+
       var res = assignment1.Contains(assignment2);
 
       res.Should().BeTrue();
