@@ -14,7 +14,7 @@
 
       const string cdToken = "$ cd ";
       if (line.StartsWith(cdToken))
-        return new CommandCd(line.Substring(cdToken.Length));
+        return new CommandCd(line[cdToken.Length..]);
 
       throw new ApplicationException($"Invalid input: {line}");
     }
@@ -23,7 +23,7 @@
     {
       const string directoryToken = "dir ";
       if (line.StartsWith(directoryToken))
-        return new Directory(line.Substring(directoryToken.Length));
+        return new Directory(line[directoryToken.Length..]);
 
       var fileParts = line.Split(' ', 2);
       return new File(fileParts[1], ulong.Parse(fileParts[0]));

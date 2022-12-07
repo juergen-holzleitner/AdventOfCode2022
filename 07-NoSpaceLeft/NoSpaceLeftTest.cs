@@ -210,5 +210,29 @@ namespace _07_NoSpaceLeft
       var size = sut.GetSumOfFoldersAtMost(100000);
       size.Should().Be(95437);
     }
+
+    [Fact]
+    public void Can_solve_part_2()
+    {
+      var input = "$ cd /\r\n$ ls\r\ndir a\r\n14848514 b.txt\r\n8504156 c.dat\r\ndir d\r\n$ cd a\r\n$ ls\r\ndir e\r\n29116 f\r\n2557 g\r\n62596 h.lst\r\n$ cd e\r\n$ ls\r\n584 i\r\n$ cd ..\r\n$ cd ..\r\n$ cd d\r\n$ ls\r\n4060174 j\r\n8033020 d.log\r\n5626152 d.ext\r\n7214296 k";
+      var sut = new Device();
+
+      foreach (var line in input.Split('\n'))
+      {
+        sut.ProcessLine(line.Trim('\r'));
+      }
+
+      var totalSize = sut.GetRootFolderSize();
+      totalSize.Should().Be(48381165);
+
+      var unused = 70000000 - totalSize;
+      unused.Should().Be(21618835);
+
+      var sizeRequired = 30000000 - unused;
+      sizeRequired.Should().Be(8381165);
+
+      var smallestSize = sut.GetSmallestDirectoryWithAtLeast(sizeRequired);
+      smallestSize.Should().Be(24933642);
+    }
   }
 }

@@ -117,5 +117,31 @@
 
       return totalSize;
     }
+
+    internal ulong GetRootFolderSize()
+    {
+      return GetFolderSize(root);
+    }
+
+    internal ulong GetSmallestDirectoryWithAtLeast(ulong sizeRequired)
+    {
+      return GetSmallestDirectoryWithAtLeast(sizeRequired, null, root)!.Value;
+    }
+
+    private ulong? GetSmallestDirectoryWithAtLeast(ulong sizeRequired, ulong? currentBest, DirectoryEntry current)
+    {
+      var size = GetFolderSize(current);
+      if (size >= sizeRequired)
+      {
+        if (!currentBest.HasValue || currentBest.Value > size)
+          currentBest = size;
+
+        foreach (var x in current.ChildItems)
+          if (x is DirectoryEntry d)
+            currentBest = GetSmallestDirectoryWithAtLeast(sizeRequired, currentBest, d);
+      }
+
+      return currentBest;
+    }
   }
 }
