@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 
 namespace _05_SupplyStacks
 {
-  internal class SupplyStack
+  internal partial class SupplyStack
   {
     internal static char ParseCrate(string crate)
     {
@@ -73,7 +73,7 @@ namespace _05_SupplyStacks
 
     internal static Instruction ParseInstruction(string instruction)
     {
-      var r = new Regex(@"move (?<Num>\d+) from (?<From>\d+) to (?<To>\d+)");
+      var r = ParseRegex();
       var match = r.Match(instruction);
       if (match.Success)
       {
@@ -172,5 +172,8 @@ namespace _05_SupplyStacks
       }
       return sb.ToString();
     }
+
+    [GeneratedRegex("move (?<Num>\\d+) from (?<From>\\d+) to (?<To>\\d+)")]
+    private static partial Regex ParseRegex();
   }
 }

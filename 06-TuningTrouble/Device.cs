@@ -9,7 +9,7 @@ namespace _06_TuningTrouble
       this.numCharsTocheck = numCharsToCheck;
     }
 
-    StringBuilder state = new StringBuilder();
+    readonly StringBuilder state = new();
     int count = 0;
     private readonly int numCharsTocheck;
 

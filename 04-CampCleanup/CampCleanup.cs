@@ -29,8 +29,8 @@
 
     internal static bool AssignmentIsContained(string input)
     {
-      var assignementPair = ParseAssignmentPair(input);
-      return assignementPair.First.Contains(assignementPair.Second) || assignementPair.Second.Contains(assignementPair.First);
+      var (First, Second) = ParseAssignmentPair(input);
+      return First.Contains(Second) || Second.Contains(First);
     }
 
     internal static int CountFullyOverlapping(IEnumerable<string> assignmentPairs)
