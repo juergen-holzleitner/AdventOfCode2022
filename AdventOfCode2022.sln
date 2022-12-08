@@ -15,7 +15,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "05-SupplyStacks", "05-Suppl
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "06-TuningTrouble", "06-TuningTrouble\06-TuningTrouble.csproj", "{6F09B732-42D8-47DB-936F-906D13F8E2CF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "07-NoSpaceLeft", "07-NoSpaceLeft\07-NoSpaceLeft.csproj", "{2706BED6-34A2-465A-BB73-9A57BB835587}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "07-NoSpaceLeft", "07-NoSpaceLeft\07-NoSpaceLeft.csproj", "{2706BED6-34A2-465A-BB73-9A57BB835587}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "08-TreetopTreeHouse", "08-TreetopTreeHouse\08-TreetopTreeHouse.csproj", "{B7BBE679-F7F0-4612-AE68-B9BBA9CAC8F9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,6 +53,10 @@ Global
 		{2706BED6-34A2-465A-BB73-9A57BB835587}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2706BED6-34A2-465A-BB73-9A57BB835587}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2706BED6-34A2-465A-BB73-9A57BB835587}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B7BBE679-F7F0-4612-AE68-B9BBA9CAC8F9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B7BBE679-F7F0-4612-AE68-B9BBA9CAC8F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B7BBE679-F7F0-4612-AE68-B9BBA9CAC8F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B7BBE679-F7F0-4612-AE68-B9BBA9CAC8F9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
