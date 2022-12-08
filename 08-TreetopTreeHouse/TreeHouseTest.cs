@@ -61,6 +61,28 @@ namespace _08_TreetopTreeHouse
       var numVisible = TreeHouse.GetNumVisible(data);
 
       numVisible.Should().Be(21);
+    }
+
+    [Fact]
+    public void Can_get_scenic_score()
+    {
+      var input = "30373\r\n25512\r\n65332\r\n33549\r\n35390";
+      var data = TreeHouse.Parse(input);
+
+      var score = TreeHouse.GetScenicScore(data, 1, 2);
+
+      score.Should().Be(4);
+    }
+
+    [Fact]
+    public void Can_get_max_scenic_score()
+    {
+      var input = "30373\r\n25512\r\n65332\r\n33549\r\n35390";
+      var data = TreeHouse.Parse(input);
+
+      var score = TreeHouse.GetMaxScenicScore(data);
+
+      score.Should().Be(8);
 
     }
   }

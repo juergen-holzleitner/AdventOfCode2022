@@ -6,3 +6,6 @@ var data = TreeHouse.Parse(input);
 var numVisible = TreeHouse.GetNumVisible(data);
 
 Console.WriteLine($"Part 1: {numVisible} trees are visible");
+
+var maxScore = TreeHouse.GetMaxScenicScore(data);
+Console.WriteLine($"Part 2: {maxScore}");
