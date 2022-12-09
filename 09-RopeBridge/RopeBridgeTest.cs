@@ -130,5 +130,31 @@ namespace _09_RopeBridge
 
       visitedTailPositions.Should().HaveCount(13);
     }
+
+    [Fact]
+    public void Can_process_first_sample_of_part2()
+    {
+      var input = "R 4\r\nU 4\r\nL 3\r\nD 1\r\nR 4\r\nD 1\r\nL 5\r\nR 2\r\n";
+      var sut = new RopeBridge(10);
+
+      sut.MoveInput(input.Split('\n'));
+
+      var visitedTailPositions = sut.GetVisitedTailPositions();
+
+      visitedTailPositions.Should().HaveCount(1);
+    }
+
+    [Fact]
+    public void Can_process_second_sample_of_part2()
+    {
+      var input = "R 5\r\nU 8\r\nL 8\r\nD 3\r\nR 17\r\nD 10\r\nL 25\r\nU 20";
+      var sut = new RopeBridge(10);
+
+      sut.MoveInput(input.Split('\n'));
+
+      var visitedTailPositions = sut.GetVisitedTailPositions();
+
+      visitedTailPositions.Should().HaveCount(36);
+    }
   }
 }

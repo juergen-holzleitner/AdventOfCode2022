@@ -7,12 +7,12 @@
 
   internal class RopeBridge
   {
-    private Position headPosition;
-    private Position tailPosition;
-    private HashSet<Position> visitedTailPositions = new();
+    private readonly Position[] ropePosition;
+    private readonly HashSet<Position> visitedTailPositions = new();
 
-    public RopeBridge()
+    public RopeBridge(int numKnots = 2)
     {
+      ropePosition = new Position[numKnots];
       MoveTail();
     }
 
@@ -22,29 +22,24 @@
         throw new ArgumentException($"{nameof(line)} has invalid value {line}");
 
       var parts = line.Split(' ');
-      switch (parts[0])
+      return parts[0] switch
       {
-        case "U":
-          return new Motion(Direction.Up, int.Parse(parts[1]));
-        case "R":
-          return new Motion(Direction.Right, int.Parse(parts[1]));
-        case "L":
-          return new Motion(Direction.Left, int.Parse(parts[1]));
-        case "D":
-          return new Motion(Direction.Down, int.Parse(parts[1]));
-      }
-
-      throw new ArgumentException($"{nameof(line)} has invalid value {line}");
+        "U" => new Motion(Direction.Up, int.Parse(parts[1])),
+        "R" => new Motion(Direction.Right, int.Parse(parts[1])),
+        "L" => new Motion(Direction.Left, int.Parse(parts[1])),
+        "D" => new Motion(Direction.Down, int.Parse(parts[1])),
+        _ => throw new ArgumentException($"{nameof(line)} has invalid value {line}"),
+      };
     }
 
     internal Position GetHeadPosition()
     {
-      return headPosition;
+      return ropePosition[0];
     }
 
     internal Position GetTailPosition()
     {
-      return tailPosition;
+      return ropePosition[^1];
     }
 
     internal void Move(Direction direction)
@@ -52,16 +47,16 @@
       switch (direction)
       {
         case Direction.Left:
-          --headPosition.X;
+          --ropePosition[0].X;
           break;
         case Direction.Right:
-          ++headPosition.X;
+          ++ropePosition[0].X;
           break;
         case Direction.Up:
-          --headPosition.Y;
+          --ropePosition[0].Y;
           break;
         case Direction.Down:
-          ++headPosition.Y;
+          ++ropePosition[0].Y;
           break;
         default:
           throw new ApplicationException("unexpected state");
@@ -71,15 +66,18 @@
 
     private void MoveTail()
     {
-      int diffX = headPosition.X - tailPosition.X;
-      int diffY = headPosition.Y - tailPosition.Y;
-      if (Math.Abs(diffX) >= 2 || Math.Abs(diffY) >= 2)
+      for (int n = 1; n < ropePosition.Length; ++n)
       {
-        tailPosition.X += Math.Sign(diffX);
-        tailPosition.Y += Math.Sign(diffY);
+        int diffX = ropePosition[n - 1].X - ropePosition[n].X;
+        int diffY = ropePosition[n - 1].Y - ropePosition[n].Y;
+        if (Math.Abs(diffX) >= 2 || Math.Abs(diffY) >= 2)
+        {
+          ropePosition[n].X += Math.Sign(diffX);
+          ropePosition[n].Y += Math.Sign(diffY);
+        }
       }
 
-      visitedTailPositions.Add(tailPosition);
+      visitedTailPositions.Add(ropePosition[^1]);
     }
 
     internal void Move(Motion motion)
