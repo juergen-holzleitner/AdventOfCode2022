@@ -6,7 +6,29 @@
 
   internal class HillClimbing
   {
-    internal static int GetMinStepsFromStartToEnd(Input input)
+    internal static int GetMinStepsFromAnyStartToEnd(Input input)
+    {
+      int? bestMinSteps = null;
+
+      for (int row = 0; row < input.Highmap.Count; ++row)
+        for (int col = 0; col < input.Highmap[row].Count; ++col)
+        {
+          if (input.Highmap[row][col] == 0)
+          {
+            var newInput = input with { Start = new Pos(row, col) };
+            var minSteps = GetMinStepsFromStartToEnd(newInput);
+            if (minSteps.HasValue)
+            {
+              if (!bestMinSteps.HasValue || bestMinSteps!.Value > minSteps.Value)
+                bestMinSteps = minSteps.Value;
+            }
+          }
+        }
+
+      return bestMinSteps!.Value;
+    }
+
+    internal static int? GetMinStepsFromStartToEnd(Input input)
     {
       var minReachable = new List<List<int?>>();
       for (int row = 0; row < input.Highmap.Count; ++row)
@@ -68,7 +90,7 @@
 
       }
 
-      return minReachable[input.End.Row][input.End.Column]!.Value;
+      return minReachable[input.End.Row][input.End.Column];
     }
 
     internal static Input Parse(string inputString)

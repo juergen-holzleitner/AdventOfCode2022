@@ -31,5 +31,16 @@ namespace _12_HillClimbing
 
       steps.Should().Be(31);
     }
+
+    [Fact]
+    public void Can_get_min_steps_from_any_low_point()
+    {
+      var inputString = "Sabqponm\r\nabcryxxl\r\naccszExk\r\nacctuvwj\r\nabdefghi";
+      var input = HillClimbing.Parse(inputString);
+
+      var steps = HillClimbing.GetMinStepsFromAnyStartToEnd(input);
+
+      steps.Should().Be(29);
+    }
   }
 }
