@@ -48,7 +48,7 @@ namespace _10_SignalStrength
       var sut = new CPU();
 
       var signalStrength = sut.GetSignalStrength();
-      
+
       signalStrength.Should().Be(0);
     }
 

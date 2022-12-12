@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+﻿using System.Text.RegularExpressions;
 
 namespace _11_Monkey
 {
@@ -58,7 +53,7 @@ namespace _11_Monkey
         var number = int.Parse(matchMonkey.Groups["number"].Value);
         return new MonkeyItem(number);
       }
-      
+
       if (matchStartingItems.Success)
       {
         var items = matchStartingItems.Groups["items"].Value;
@@ -177,7 +172,7 @@ namespace _11_Monkey
           ++monkey.NumInspected;
 
           var worryLevel = monkey.Operation!.Func(item);
-          
+
           if (reduceWorryLevelAfterInspection)
             worryLevel /= 3;
 
@@ -207,7 +202,7 @@ namespace _11_Monkey
     {
       ProcessRounds(monkeys, rounds);
 
-      var monkeyBusiness = (from m in monkeys orderby m.NumInspected descending select m.NumInspected).Take(2).Aggregate((a,x) => a*x);
+      var monkeyBusiness = (from m in monkeys orderby m.NumInspected descending select m.NumInspected).Take(2).Aggregate((a, x) => a * x);
       return monkeyBusiness;
     }
 

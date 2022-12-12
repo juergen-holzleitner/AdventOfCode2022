@@ -17,7 +17,7 @@ namespace _12_HillClimbing
       input.Highmap[0][0].Should().Be(0);
       input.Highmap[2][5].Should().Be(25);
       input.Highmap[0][7].Should().Be(12);
-      
+
       input.Start.Should().Be(new Pos(0, 0));
     }
 

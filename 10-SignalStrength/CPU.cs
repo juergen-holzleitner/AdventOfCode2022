@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 
 namespace _10_SignalStrength
 {
@@ -12,13 +8,13 @@ namespace _10_SignalStrength
     private int registerX = 1;
     private int signalStrength = 0;
 
-    private readonly int[] signalCycles = {20, 60, 100, 140, 180, 220 };
+    private readonly int[] signalCycles = { 20, 60, 100, 140, 180, 220 };
 
     private readonly StringBuilder image = new();
 
     internal void Execute(string instruction)
     {
-      if (string.IsNullOrEmpty(instruction)) 
+      if (string.IsNullOrEmpty(instruction))
         return;
 
       const string addInstruction = "addx ";
@@ -54,7 +50,7 @@ namespace _10_SignalStrength
 
       if (cycle <= 240)
       {
-        if (Math.Abs(((cycle -1 ) % 40) - registerX) <= 1)
+        if (Math.Abs(((cycle - 1) % 40) - registerX) <= 1)
           image.Append('#');
         else
           image.Append('.');
