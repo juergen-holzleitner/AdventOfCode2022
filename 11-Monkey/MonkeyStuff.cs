@@ -11,11 +11,11 @@ namespace _11_Monkey
 
   record MonkeyItem(int Number) : Parsable;
 
-  record StartingItem(List<int> Items) : Parsable;
+  record StartingItem(List<ulong> Items) : Parsable;
 
-  record OperationItem(Func<int, int> Func) : Parsable;
+  record OperationItem(Func<ulong, ulong> Func) : Parsable;
 
-  record DivisibleTest(int Divisor) : Parsable;
+  record DivisibleTest(ulong Divisor) : Parsable;
 
   record MonkeyIfTrue(int Monkey) : Parsable;
 
@@ -28,7 +28,7 @@ namespace _11_Monkey
     public DivisibleTest? DivisibleTest { get; set; }
     public MonkeyIfTrue? MonkeyIfTrue { get; set; }
     public MonkeyIfFalse? MonkeyIfFalse { get; set; }
-    public int NumInspected { get; set; } = 0;
+    public ulong NumInspected { get; set; } = 0;
   }
 
   internal partial class MonkeyStuff
@@ -62,10 +62,10 @@ namespace _11_Monkey
       if (matchStartingItems.Success)
       {
         var items = matchStartingItems.Groups["items"].Value;
-        var itemList = new List<int>();
+        var itemList = new List<ulong>();
         foreach (var i in items.Split(','))
         {
-          itemList.Add(int.Parse(i));
+          itemList.Add(ulong.Parse(i));
         }
 
         return new StartingItem(itemList);
@@ -80,7 +80,7 @@ namespace _11_Monkey
         }
         else
         {
-          int val = int.Parse(matchOperation.Groups["arg"].Value);
+          var val = ulong.Parse(matchOperation.Groups["arg"].Value);
           switch (matchOperation.Groups["op"].Value)
           {
             case "+":
@@ -93,7 +93,7 @@ namespace _11_Monkey
 
       if (matchDivisibleTest.Success)
       {
-        var val = int.Parse(matchDivisibleTest.Groups["divisor"].Value);
+        var val = ulong.Parse(matchDivisibleTest.Groups["divisor"].Value);
         return new DivisibleTest(val);
       }
 
@@ -164,8 +164,10 @@ namespace _11_Monkey
       return monkeys;
     }
 
-    internal static void ProcessRound(List<Monkey> monkeys)
+    internal static void ProcessRound(List<Monkey> monkeys, bool reduceWorryLevelAfterInspection)
     {
+      var commonMultiple = (from m in monkeys select m.DivisibleTest!.Divisor).Aggregate((a, x) => a * x);
+
       foreach (var monkey in monkeys)
       {
         var items = monkey.StartingItem!.Items;
@@ -175,7 +177,12 @@ namespace _11_Monkey
           ++monkey.NumInspected;
 
           var worryLevel = monkey.Operation!.Func(item);
-          worryLevel /= 3;
+          
+          if (reduceWorryLevelAfterInspection)
+            worryLevel /= 3;
+
+          worryLevel %= commonMultiple;
+
           if (worryLevel % monkey.DivisibleTest!.Divisor == 0)
             monkeys[monkey.MonkeyIfTrue!.Monkey].StartingItem!.Items.Add(worryLevel);
           else
@@ -187,14 +194,28 @@ namespace _11_Monkey
     internal static void ProcessRounds(List<Monkey> monkeys, int rounds)
     {
       for (int n = 0; n < rounds; ++n)
-        ProcessRound(monkeys);
+        ProcessRound(monkeys, true);
     }
 
-    internal static int GetMonkeyBusiness(List<Monkey> monkeys, int rounds)
+    internal static void ProcessRoundsWithoutDiv(List<Monkey> monkeys, int rounds)
+    {
+      for (int n = 0; n < rounds; ++n)
+        ProcessRound(monkeys, false);
+    }
+
+    internal static ulong GetMonkeyBusiness(List<Monkey> monkeys, int rounds)
     {
       ProcessRounds(monkeys, rounds);
 
       var monkeyBusiness = (from m in monkeys orderby m.NumInspected descending select m.NumInspected).Take(2).Aggregate((a,x) => a*x);
+      return monkeyBusiness;
+    }
+
+    internal static ulong GetMonkeyBusinessWithoutDiv(List<Monkey> monkeys, int rounds)
+    {
+      ProcessRoundsWithoutDiv(monkeys, rounds);
+
+      var monkeyBusiness = (from m in monkeys orderby m.NumInspected descending select m.NumInspected).Take(2).Aggregate((a, x) => a * x);
       return monkeyBusiness;
     }
   }
