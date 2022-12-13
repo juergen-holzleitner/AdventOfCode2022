@@ -170,5 +170,33 @@
 
       return sum;
     }
+
+    internal static int GetDecoderKey(IEnumerable<string> lines)
+    {
+      int beforeA = 0;
+      int beforeB = 0;
+
+      var deviderPacketA = Parse("[[2]]");
+      var deviderPacketB = Parse("[[6]]");
+
+      var pairs = ParseInput(lines);
+      foreach (var pair in pairs)
+      {
+        if (CheckPair(new PacketPair(pair.Left, deviderPacketA)))
+          ++beforeA;
+        else if (CheckPair(new PacketPair(pair.Left, deviderPacketB)))
+          ++beforeB;
+
+        if (CheckPair(new PacketPair(pair.Right, deviderPacketA)))
+          ++beforeA;
+        else if (CheckPair(new PacketPair(pair.Right, deviderPacketB)))
+          ++beforeB;
+      }
+
+      var posDeviderA = beforeA + 1;
+      var posDeviderB = posDeviderA + beforeB + 1;
+
+      return posDeviderA * posDeviderB;
+    }
   }
 }
