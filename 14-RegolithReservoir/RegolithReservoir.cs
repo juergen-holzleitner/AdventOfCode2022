@@ -97,18 +97,27 @@
       return sandPositions.Contains(pos);
     }
 
-    internal static bool AddSand(Cave cave, List<Pos> sandPositions)
+    internal static bool AddSand(Cave cave, List<Pos> sandPositions, bool blockAtMaxPosPlusTwo, int maxVerticalPosition)
     {
       var sandPosition = new Pos(500, 0);
       if (IsPositionBlocked(sandPosition, cave, sandPositions))
-        throw new ApplicationException("initial position should not be blocked");
-
-      var maxVerticalPosition = GetMaxVerticalPosition(cave);
+        return false;
 
       for (; ; )
       {
-        if (sandPosition.Y >= maxVerticalPosition)
-          return false;
+        if (blockAtMaxPosPlusTwo)
+        {
+          if (sandPosition.Y >= maxVerticalPosition + 1)
+          {
+            sandPositions.Add(sandPosition);
+            return true;
+          }
+        }
+        else
+        {
+          if (sandPosition.Y >= maxVerticalPosition)
+            return false;
+        }
 
         var newSandPosition = sandPosition with { Y = sandPosition.Y + 1 };
         if (!IsPositionBlocked(newSandPosition, cave, sandPositions))
@@ -146,12 +155,13 @@
       return false;
     }
 
-    internal static int GetNumSandsAdded(string lines)
+    internal static int GetNumSandsAdded(string lines, bool blockAtMaxPosPlusTwo)
     {
       var cave = ParseCave(lines);
       var sandPositions = new List<Pos>();
+      var maxVerticalPosition = GetMaxVerticalPosition(cave);
 
-      while (AddSand(cave, sandPositions)) ;
+      while (AddSand(cave, sandPositions, blockAtMaxPosPlusTwo, maxVerticalPosition)) ;
 
       return sandPositions.Count;
     }

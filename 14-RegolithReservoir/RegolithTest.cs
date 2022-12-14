@@ -97,7 +97,7 @@ namespace _14_RegolithReservoir
       var cave = RegolithReservoir.ParseCave(lines);
       var sandPositions = new List<Pos>();
 
-      bool wasAdded = RegolithReservoir.AddSand(cave, sandPositions);
+      bool wasAdded = RegolithReservoir.AddSand(cave, sandPositions, false, RegolithReservoir.GetMaxVerticalPosition(cave));
 
       wasAdded.Should().BeTrue();
       sandPositions.Should().BeEquivalentTo(new Pos[] { new Pos(500, 8) });
@@ -120,7 +120,7 @@ namespace _14_RegolithReservoir
 
       for (int n = 0; n < numSand; ++n)
       {
-        bool wasAdded = RegolithReservoir.AddSand(cave, sandPositions);
+        bool wasAdded = RegolithReservoir.AddSand(cave, sandPositions, false, RegolithReservoir.GetMaxVerticalPosition(cave));
         wasAdded.Should().BeTrue();
       }
       sandPositions.Should().HaveCount(numSand);
@@ -128,14 +128,23 @@ namespace _14_RegolithReservoir
     }
 
     [Fact]
-    public void Can_get_num_sands_added()
+    public void Can_get_num_sands_added_without_blocking()
     {
       var lines = "498,4 -> 498,6 -> 496,6\r\n503,4 -> 502,4 -> 502,9 -> 494,9";
 
-      var numSands = RegolithReservoir.GetNumSandsAdded(lines);
+      var numSands = RegolithReservoir.GetNumSandsAdded(lines, false);
 
       numSands.Should().Be(24);
     }
 
+    [Fact]
+    public void Can_get_num_sands_added_with_blocking()
+    {
+      var lines = "498,4 -> 498,6 -> 496,6\r\n503,4 -> 502,4 -> 502,9 -> 494,9";
+
+      var numSands = RegolithReservoir.GetNumSandsAdded(lines, true);
+
+      numSands.Should().Be(93);
+    }
   }
 }
