@@ -77,17 +77,16 @@ namespace _16_ProboscideaVolcanium
     {
       var initialState = GetInitialState(input);
       int bestPressure = initialState.TotalPressure;
-      var openStates = new Stack<State>();
-      openStates.Push(initialState);
+      var openStates = new PriorityQueue<State, int>();
+      openStates.Enqueue(initialState, -initialState.TotalPressure);
 
-      while (openStates.Any())
+      while (openStates.TryDequeue(out State currentState, out int _))
       {
-        var currentState = openStates.Pop();
         if (currentState.TotalPressure > bestPressure)
           bestPressure = currentState.TotalPressure;
 
         foreach (var newState in currentState.GetPossibleNextStates(bestPressure))
-          openStates.Push(newState);
+          openStates.Enqueue(newState, -newState.TotalPressure);
       }
 
       return bestPressure;
