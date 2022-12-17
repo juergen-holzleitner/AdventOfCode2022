@@ -35,7 +35,7 @@ namespace _17_PyroclasticFlow
 
       for (int n = 0; n < numElement; ++n)
         enumerator.MoveNext().Should().BeTrue();
-      
+
       enumerator.Current.Should().Be(expectedMove);
     }
 
@@ -87,7 +87,7 @@ namespace _17_PyroclasticFlow
     {
       var elements = Flow.GetShapeElements(ShapeType.Dash, new Pos(0, 0));
 
-      elements.Should().BeEquivalentTo(new[] {new Pos(0, 0), new Pos(1, 0), new Pos(2, 0), new Pos(3, 0)});
+      elements.Should().BeEquivalentTo(new[] { new Pos(0, 0), new Pos(1, 0), new Pos(2, 0), new Pos(3, 0) });
     }
 
     [Fact]
@@ -160,12 +160,62 @@ namespace _17_PyroclasticFlow
       height.Should().Be(3068);
     }
 
-    //[Fact]
-    //public void Can_get_height_of_sample_part2()
-    //{
-    //  var input = ">>><<><>><<<>><>>><<<>>><<<><<<>><>><<>>";
-    //  var height = Chamber.GetHeightAfterElements(input, 1000000000000);
-    //  height.Should().Be(1514285714288);
-    //}
+    [Fact]
+    public void Can_get_input_cycle()
+    {
+      var input = ">>><<><>><<<>><>>><<<>>><<<><<<>><>><<>>";
+      var inputCycle = Chamber.GetInputCycleLength(input);
+      inputCycle.Should().Be(40);
+    }
+
+    [Fact]
+    public void Can_get_state_profile()
+    {
+      var input = ">>><<><>><<<>><>>><<<>>><<<><<<>><>><<>>";
+      var chamber = new Chamber(input);
+
+      chamber.DoStepUntilNextStopped();
+      var profile = chamber.GetStateProfile();
+
+      profile.LastShape.Should().Be(ShapeType.Dash);
+      profile.InputIndex.Should().Be(4);
+      profile.HeightMap.Should().BeEquivalentTo(new[] { 1, 1, 0, 0, 0, 0, 1 });
+    }
+
+    [Fact]
+    public void Can_get_state_profile_after_10()
+    {
+      var input = ">>><<><>><<<>><>>><<<>>><<<><<<>><>><<>>";
+      var chamber = new Chamber(input);
+
+      for (int n = 0; n < 10; ++n)
+      {
+        chamber.DoStepUntilNextStopped();
+      }
+
+      var profile = chamber.GetStateProfile();
+
+      profile.LastShape.Should().Be(ShapeType.Square);
+      profile.InputIndex.Should().Be(12);
+      profile.HeightMap.Should().BeEquivalentTo(new[] { 3, 3, 4, 4, 0, 2, 17 });
+    }
+
+    [Fact]
+    public void Can_get_repeating_cycle()
+    {
+      var input = ">>><<><>><<<>><>>><<<>>><<<><<<>><>><<>>";
+      var (initial, loopSize) = Chamber.GetInputCycle(input);
+
+      initial.Should().Be(148);
+      loopSize.Should().Be(200);
+    }
+
+    [Fact]
+    public void Can_get_height_of_sample_part2()
+    {
+      var input = ">>><<><>><<<>><>>><<<>>><<<><<<>><>><<>>";
+      var height = Chamber.GetHeightAfterElementsPart2(input, 1000000000000);
+      height.Should().Be(1514285714288);
+    }
   }
 }
