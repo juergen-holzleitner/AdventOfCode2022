@@ -4,7 +4,7 @@
 
   public enum MoveType { Left, Right };
 
-  record struct Pos(int X, int Y);
+  record struct Pos(int X, long Y);
 
   record Shape
   {

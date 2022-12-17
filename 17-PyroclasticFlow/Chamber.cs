@@ -4,6 +4,8 @@ namespace _17_PyroclasticFlow
 {
   internal class Chamber
   {
+    private readonly string initialInput;
+
     private readonly IEnumerator<MoveType> nextMoves;
     private readonly IEnumerator<ShapeType> shapeTypes;
 
@@ -11,13 +13,14 @@ namespace _17_PyroclasticFlow
 
     public List<Shape> StoppedShapes { get; private init; } = new();
 
-    public int CurrentTotalHeight { get; private set; }
+    public long CurrentTotalHeight { get; private set; }
 
     private const int chamberWidth = 7;
 
     public Chamber(string input)
     {
-      nextMoves = Flow.GetMoves(input).GetEnumerator();
+      initialInput = input.Trim();
+      nextMoves = Flow.GetMoves(initialInput).GetEnumerator();
       shapeTypes = Flow.GetShapes().GetEnumerator();
     }
 
@@ -45,7 +48,7 @@ namespace _17_PyroclasticFlow
         CurrentShape.SetPos(newPos);
       else
       {
-        int newHight = CurrentShape.Pos.Y + GetShapeHeight(CurrentShape.ShapeType);
+        long newHight = CurrentShape.Pos.Y + GetShapeHeight(CurrentShape.ShapeType);
         if (newHight > CurrentTotalHeight)
           CurrentTotalHeight = newHight;
 
@@ -78,7 +81,7 @@ namespace _17_PyroclasticFlow
       return true;
     }
 
-    private bool IsShapeCollision(Shape shape, ShapeType shapeType, Pos newPos)
+    private static bool IsShapeCollision(Shape shape, ShapeType shapeType, Pos newPos)
     {
       if (newPos.Y > shape.Pos.Y + GetShapeHeight(shape.ShapeType)) 
         return false;
@@ -122,10 +125,10 @@ namespace _17_PyroclasticFlow
       return pos with { X = move == MoveType.Left ? pos.X - 1 : pos.X + 1 };
     }
 
-    static internal int GetHeightAfterElements(string input, int numElements)
+    static internal long GetHeightAfterElements(string input, long numElements)
     {
       var chamber = new Chamber(input);
-      for (int n = 0; n < numElements; ++n)
+      for (long n = 0; n < numElements; ++n)
         chamber.DoStepUntilNextStopped();
 
       return chamber.CurrentTotalHeight;

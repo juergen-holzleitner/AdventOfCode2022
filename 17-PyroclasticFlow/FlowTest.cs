@@ -153,11 +153,19 @@ namespace _17_PyroclasticFlow
     }
 
     [Fact]
-    public void Can_get_height_of_sample()
+    public void Can_get_height_of_sample_part1()
     {
       var input = ">>><<><>><<<>><>>><<<>>><<<><<<>><>><<>>";
       var height = Chamber.GetHeightAfterElements(input, 2022);
       height.Should().Be(3068);
     }
+
+    //[Fact]
+    //public void Can_get_height_of_sample_part2()
+    //{
+    //  var input = ">>><<><>><<<>><>>><<<>>><<<><<<>><>><<>>";
+    //  var height = Chamber.GetHeightAfterElements(input, 1000000000000);
+    //  height.Should().Be(1514285714288);
+    //}
   }
 }
