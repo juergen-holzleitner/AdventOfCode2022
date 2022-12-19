@@ -8,6 +8,20 @@ namespace _19_Minerals
 
   internal class Factory
   {
+    internal static int GetPartTwo(string input)
+    {
+      var prod = 1;
+      var blueprints = ParseAllBlueprints(input);
+      foreach (var blueprint in blueprints.Take(3))
+      {
+        var configuration = new Configuration(blueprint);
+        var numGeodes = configuration.GetMaxGeodesAfter(32);
+        prod *= numGeodes;
+      }
+
+      return prod;
+    }
+
     internal static int GetQualityLevel(string input)
     {
       var sum = 0;

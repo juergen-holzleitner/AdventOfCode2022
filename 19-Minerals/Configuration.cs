@@ -10,7 +10,6 @@ namespace _19_Minerals
 {
   internal class Configuration : IComparable<Configuration>, IEquatable<Configuration>
   {
-    public int TimeLeft { get; private set; } = 24;
     public Dictionary<Mineral, int> Stock { get; private set; } = new();
     public Dictionary<Mineral, int> Roboter { get; private set; } = new();
 
@@ -29,9 +28,6 @@ namespace _19_Minerals
 
     internal IEnumerable<Configuration> GetNextConfigurations(Dictionary<Mineral, int> maxUsefulRoboters)
     {
-      if (TimeLeft <= 0)
-        yield break;
-
       if (CanProduceMineralRobot(Mineral.Geode))
       {
         var newConfigWithRoboter = Clone();
@@ -109,19 +105,11 @@ namespace _19_Minerals
     {
       foreach (var mineral in Enum.GetValues<Mineral>())
         Stock[mineral] += Roboter[mineral];
-      
-      if (TimeLeft < 1)
-        throw new ApplicationException("TimeLeft should be greater than 0 here");
-
-      --TimeLeft;
     }
 
     private Configuration Clone()
     {
-      var config = new Configuration(blueprint)
-      {
-        TimeLeft = TimeLeft
-      };
+      var config = new Configuration(blueprint);
       foreach (var mineral in Enum.GetValues<Mineral>())
       {
         config.Roboter[mineral] = Roboter[mineral];
@@ -161,7 +149,11 @@ namespace _19_Minerals
             }
           }
         }
-        configurations = newConfigurations;
+
+        var maxGeods = newConfigurations.Select(x => x.Stock[Mineral.Geode]).Max();
+        var maxGeodRoboter = newConfigurations.Select(x => x.Roboter[Mineral.Geode]).Max();
+
+        configurations = newConfigurations.Where(x => x.Roboter[Mineral.Geode] >= maxGeodRoboter || x.Stock[Mineral.Geode] >= maxGeods - 1).ToList();
       }
 
       return configurations;
@@ -176,9 +168,6 @@ namespace _19_Minerals
     {
       if (other == null)
         return 1;
-
-      if (TimeLeft != other.TimeLeft)
-        return TimeLeft.CompareTo(other.TimeLeft);
 
       foreach (var mineral in Enum.GetValues<Mineral>())
       {
@@ -212,7 +201,7 @@ namespace _19_Minerals
 
     public int GetHashCode([DisallowNull] Configuration obj)
     {
-      var val = obj.TimeLeft;
+      var val = 0;
       foreach (var mineral in Enum.GetValues<Mineral>())
       {
         val <<= 4;
