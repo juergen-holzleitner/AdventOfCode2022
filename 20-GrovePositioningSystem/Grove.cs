@@ -2,10 +2,10 @@
 {
   internal class Grove
   {
-    internal record struct Element(int Value, int Position);
+    internal record struct Element(long Value, int Position);
     internal record Input(List<Element> Elements);
 
-    internal static Input ParseInput(string input)
+    internal static Input ParseInput(string input, long multiplier)
     {
       var numbers = new List<Element>();
       int index = 0;
@@ -13,7 +13,7 @@
         if (!string.IsNullOrWhiteSpace(line))
         {
 
-          var number = int.Parse(line.Trim());
+          var number = long.Parse(line.Trim()) * multiplier;
           numbers.Add(new Element(number, index));
           ++index;
         }
@@ -30,27 +30,20 @@
 
       if (element.Value > 0)
       {
-        for (int n = 0; n < element.Value; ++n)
+        long numMoves = element.Value % (input.Elements.Count - 1);
+        for (long n = 0; n < numMoves; ++n)
         {
-          SwapForward(input.Elements, currentIndex + n);
+          SwapForward(input.Elements, (int)(currentIndex + n));
         }
       }
       else
       {
-        for (int n = 0; n < Math.Abs(element.Value); ++n)
+        long numMoves = Math.Abs(element.Value) % (input.Elements.Count - 1);
+        for (long n = 0; n < numMoves; ++n)
         {
-          SwapBackward(input.Elements, currentIndex - n);
+          SwapBackward(input.Elements, (int)(currentIndex - n));
         }
       }
-
-      //var newIndex = (currentIndex + element.Value) % (input.Elements.Count - 1);
-      //if (newIndex < 0)
-      //{
-      //  newIndex += input.Elements.Count;
-      //}
-
-      //input.Elements.RemoveAt(currentIndex);
-      //input.Elements.Insert(newIndex, element);
     }
 
     private static void SwapForward(List<Element> elements, int position)
@@ -82,21 +75,24 @@
       return newPos;
     }
 
-    internal static List<Element> MoveAllElements(string inputData)
+    internal static List<Element> MoveAllElements(string inputData, long multiplier, int numMoves)
     {
-      var input = ParseInput(inputData);
-      for (int n = 0; n < input.Elements.Count; n++)
-        MoveElement(input, n);
+      var input = ParseInput(inputData, multiplier);
+      for (int m = 0; m < numMoves; ++m)
+      {
+        for (int n = 0; n < input.Elements.Count; n++)
+          MoveElement(input, n);
+      }
       return input.Elements;
     }
 
-    internal static int GetGroveCoordinate(string inputData)
+    internal static long GetGroveCoordinate(string inputData, long multiplier, int numMoves)
     {
-      var elements = MoveAllElements(inputData);
+      var elements = MoveAllElements(inputData, multiplier, numMoves);
 
       var zeroIndex = elements.FindIndex(e => e.Value == 0);
 
-      var sum = 0;
+      long sum = 0;
       for (int n = 0; n < 3; ++n)
       {
         var currentIndex = zeroIndex + (n + 1) * 1000;
@@ -108,9 +104,9 @@
       return sum;
     }
 
-    internal static List<Element> MoveAllElementsForNSteps(string inputData, int numSteps)
+    internal static List<Element> MoveAllElementsForNSteps(string inputData, long multiplier, int numSteps)
     {
-      var input = ParseInput(inputData);
+      var input = ParseInput(inputData, multiplier);
       for (int n = 0; n < numSteps; n++)
         MoveElement(input, n);
       return input.Elements;
