@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Net.NetworkInformation;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Diagnostics.CodeAnalysis;
 
 namespace _19_Minerals
 {
@@ -69,7 +63,7 @@ namespace _19_Minerals
         int maxCost = 0;
         foreach (var roboter in blueprint.RoboterCosts)
         {
-          if (roboter.Value.ContainsKey(mineral) && roboter.Value[mineral] > maxCost)
+          if (roboter.Value.TryGetValue(mineral, out int value) && value > maxCost)
             maxCost = roboter.Value[mineral];
         }
         dictionary.Add(mineral, maxCost);
@@ -84,7 +78,7 @@ namespace _19_Minerals
       {
         if (Stock[requiredMineral.Key] < requiredMineral.Value)
           throw new ApplicationException("minerals are expected to be available");
-        
+
         Stock[requiredMineral.Key] -= requiredMineral.Value;
       }
 
@@ -161,7 +155,7 @@ namespace _19_Minerals
 
     internal int GetMaxGeodesAfter(int minutes)
     {
-      return GetNextConfigurationsAfter(minutes).Select(c => c.Stock[Mineral.Geode]).Max();      
+      return GetNextConfigurationsAfter(minutes).Select(c => c.Stock[Mineral.Geode]).Max();
     }
 
     public int CompareTo(Configuration? other)
@@ -175,7 +169,7 @@ namespace _19_Minerals
           return Stock[mineral].CompareTo(other.Stock[mineral]);
       }
 
-      foreach(var mineral in Enum.GetValues<Mineral>())
+      foreach (var mineral in Enum.GetValues<Mineral>())
       {
         if (Roboter[mineral] != other.Roboter[mineral])
           return Roboter[mineral].CompareTo(other.Roboter[mineral]);
@@ -189,7 +183,15 @@ namespace _19_Minerals
       return CompareTo(other) == 0;
     }
 
+    public override bool Equals(object? obj)
+    {
+      return Equals(obj as Configuration);
+    }
 
+    public override int GetHashCode()
+    {
+      return new ConfigurationComperer().GetHashCode(this);
+    }
   }
 
   internal class ConfigurationComperer : IEqualityComparer<Configuration>

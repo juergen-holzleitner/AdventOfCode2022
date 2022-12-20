@@ -1,5 +1,4 @@
 using FluentAssertions;
-using FluentAssertions.Common;
 
 namespace _19_Minerals
 {
@@ -45,7 +44,7 @@ namespace _19_Minerals
 
       foreach (var mineral in Enum.GetValues<Mineral>())
       {
-        configuration.Roboter[mineral].Should().Be(mineral == Mineral.Ore ? 1: 0);
+        configuration.Roboter[mineral].Should().Be(mineral == Mineral.Ore ? 1 : 0);
       }
     }
 
