@@ -13,6 +13,15 @@ namespace _21_MonkeyMath
 
   internal partial class MonkeyMath
   {
+
+    internal static long GetHumanValue(string monkeyName, string humanName, string input)
+    {
+      var monkeys = ParseInput(input);
+      var monkeyJob = monkeys[monkeyName];
+
+      return GetHumanValue(monkeys, (MathOperationJob)monkeyJob, humanName);
+    }
+
     internal static long GetResultOf(string monkeyName, string input)
     {
       var monkeys = ParseInput(input);
@@ -29,6 +38,99 @@ namespace _21_MonkeyMath
 
       var mathJob = (MathOperationJob)job;
       return CalculateMathJob(monkeys, mathJob);
+    }
+
+    private static long GetHumanValue(Dictionary<string, Job> monkeys, MathOperationJob monkeyJob, string humanName)
+    {
+      if (HasHuman(monkeys, monkeyJob.First, humanName))
+      {
+        var expectedValue = GetResultOf(monkeys, monkeyJob.Second);
+        var enforcedValue = GetEnforcedValue(monkeys, monkeyJob.First, humanName, expectedValue);
+        return enforcedValue;
+      }
+      else
+      {
+        var expectedValue = GetResultOf(monkeys, monkeyJob.Second);
+        var enforcedValue = GetEnforcedValue(monkeys, monkeyJob.Second, humanName, expectedValue);
+        return enforcedValue;
+      }
+    }
+
+    internal static long GetEnforcedValue(Dictionary<string, Job> monkeys, string currentName, string humanName, long enforcedValue)
+    {
+      if (currentName == humanName)
+        return enforcedValue;
+
+      var mathJob = (MathOperationJob)monkeys[currentName];
+      if (HasHuman(monkeys, mathJob.First, humanName))
+      {
+        var otherValue = GetResultOf(monkeys, mathJob.Second);
+        var newEnforcedValue = GetNewEnforcedLeftValue(otherValue, mathJob.Operation, enforcedValue);
+        return GetEnforcedValue(monkeys, mathJob.First, humanName, newEnforcedValue);
+      }
+      else
+      {
+        var otherValue = GetResultOf(monkeys, mathJob.First);
+        var newEnforcedValue = GetNewEnforcedRightValue(otherValue, mathJob.Operation, enforcedValue);
+        return GetEnforcedValue(monkeys, mathJob.Second, humanName, newEnforcedValue);
+      }
+    }
+
+    public static long GetNewEnforcedLeftValue(long rightValue, Operation operation, long enforcedValue)
+    {
+      switch (operation)
+      {
+        case Operation.Addition:
+          return enforcedValue - rightValue;
+        case Operation.Subtraction:
+          return enforcedValue + rightValue;
+        case Operation.Multiplication:
+          if (enforcedValue % rightValue != 0)
+            throw new ApplicationException("division with remainder");
+          return enforcedValue / rightValue;
+        case Operation.Division:
+          return enforcedValue * rightValue;
+      }
+
+      throw new ApplicationException("unexpected operation");
+    }
+    public static long GetNewEnforcedRightValue(long leftValue, Operation operation, long enforcedValue)
+    {
+      switch (operation)
+      {
+        case Operation.Addition:
+          return enforcedValue - leftValue;
+        case Operation.Subtraction:
+          return leftValue - enforcedValue;
+        case Operation.Multiplication:
+          if (enforcedValue % leftValue != 0)
+            throw new ApplicationException("division with remainder");
+          return enforcedValue / leftValue;
+        case Operation.Division:
+          if (leftValue % enforcedValue != 0)
+            throw new ApplicationException("division with remainder");
+          return leftValue / enforcedValue;
+      }
+
+      throw new ApplicationException("unexpected operation");
+    }
+
+    internal static bool HasHuman(Dictionary<string, Job> monkeys, string current, string humanName)
+    {
+      if (current == humanName)
+        return true;
+
+      var job = monkeys[current];
+
+      if (job is MathOperationJob mathJob)
+      {
+        if (HasHuman(monkeys, mathJob.First, humanName))
+          return true;
+        if (HasHuman(monkeys, mathJob.Second, humanName))
+          return true;
+      }
+
+      return false;
     }
 
     private static long CalculateMathJob(Dictionary<string, Job> monkeys, MathOperationJob mathJob)
