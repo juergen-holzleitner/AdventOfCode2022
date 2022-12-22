@@ -16,7 +16,7 @@ namespace _22_MonkeyMap
     public void Can_parse_input()
     {
       var input = "        ...#\r\n        .#..\r\n        #...\r\n        ....\r\n...#.......#\r\n........#...\r\n..#....#....\r\n..........#.\r\n        ...#....\r\n        .....#..\r\n        .#......\r\n        ......#.\r\n\r\n10R5L5R10L4R5L5\r\n";
-      var inp = Map.ParseInput(input);
+      var inp = Map.ParseInput(input, 4);
 
       inp.Board.Field.GetLength(0).Should().Be(16);
       inp.Board.Field.GetLength(1).Should().Be(12);
@@ -61,7 +61,7 @@ namespace _22_MonkeyMap
     public void Can_get_next_position(int startX, int startY, Direction direction, int expectedX, int expectedY)
     {
       var input = "        ...#\r\n        .#..\r\n        #...\r\n        ....\r\n...#.......#\r\n........#...\r\n..#....#....\r\n..........#.\r\n        ...#....\r\n        .....#..\r\n        .#......\r\n        ......#.\r\n\r\n10R5L5R10L4R5L5\r\n";
-      var inp = Map.ParseInput(input);
+      var inp = Map.ParseInput(input, 4);
 
       var pos = inp.Board.GetNextPosition(new Pos(startX, startY), direction);
       pos.Should().Be(new Pos(expectedX, expectedY));
@@ -71,7 +71,7 @@ namespace _22_MonkeyMap
     public void Can_initialize_player()
     {
       var input = "        ...#\r\n        .#..\r\n        #...\r\n        ....\r\n...#.......#\r\n........#...\r\n..#....#....\r\n..........#.\r\n        ...#....\r\n        .....#..\r\n        .#......\r\n        ......#.\r\n\r\n10R5L5R10L4R5L5\r\n";
-      var inp = Map.ParseInput(input);
+      var inp = Map.ParseInput(input, 4);
 
       var player = new Player(inp.Board);
       player.Direction.Should().Be(Direction.Right);
@@ -82,10 +82,10 @@ namespace _22_MonkeyMap
     public void Player_can_move()
     {
       var input = "        ...#\r\n        .#..\r\n        #...\r\n        ....\r\n...#.......#\r\n........#...\r\n..#....#....\r\n..........#.\r\n        ...#....\r\n        .....#..\r\n        .#......\r\n        ......#.\r\n\r\n10R5L5R10L4R5L5\r\n";
-      var inp = Map.ParseInput(input);
+      var inp = Map.ParseInput(input, 4);
 
       var player = new Player(inp.Board);
-      player.DoInstruction(new MoveInstruction(5));
+      player.DoInstruction(new MoveInstruction(5), false);
       player.Pos.Should().Be(new Pos(10, 0));
     }
 
@@ -109,7 +109,7 @@ namespace _22_MonkeyMap
     public void Can_get_final_player()
     {
       var input = "        ...#\r\n        .#..\r\n        #...\r\n        ....\r\n...#.......#\r\n........#...\r\n..#....#....\r\n..........#.\r\n        ...#....\r\n        .....#..\r\n        .#......\r\n        ......#.\r\n\r\n10R5L5R10L4R5L5\r\n";
-      var player = Map.GetFinalPlayer(input);
+      var player = Map.GetFinalPlayer(input, 4, false);
       player.Pos.Should().Be(new Pos(7, 5));
       player.Direction.Should().Be(Direction.Right);
     }
@@ -129,8 +129,70 @@ namespace _22_MonkeyMap
     public void Can_get_final_score()
     {
       var input = "        ...#\r\n        .#..\r\n        #...\r\n        ....\r\n...#.......#\r\n........#...\r\n..#....#....\r\n..........#.\r\n        ...#....\r\n        .....#..\r\n        .#......\r\n        ......#.\r\n\r\n10R5L5R10L4R5L5\r\n";
-      var score = Map.GetFinalScore(input);
+      var score = Map.GetFinalScore(input, 4, false);
       score.Should().Be(6032);
+    }
+
+    [Theory]
+    [InlineData(7, 0, 1)]
+    [InlineData(0, 7, 2)]
+    [InlineData(7, 4, 3)]
+    [InlineData(8, 4, 4)]
+    [InlineData(8, 8, 5)]
+    [InlineData(15, 11, 6)]
+    public void Can_get_map_face(int X, int Y, int expectedFace)
+    {
+      var input = "        ...#\r\n        .#..\r\n        #...\r\n        ....\r\n...#.......#\r\n........#...\r\n..#....#....\r\n..........#.\r\n        ...#....\r\n        .....#..\r\n        .#......\r\n        ......#.\r\n\r\n10R5L5R10L4R5L5\r\n";
+      var inp = Map.ParseInput(input, 4);
+      var pos = new Pos(X, Y);
+
+      var face = inp.Board.GetFace(pos);
+
+      face.Should().Be(expectedFace);
+    }
+
+    [Theory]
+    [InlineData(8, 0, Direction.Right, 9, 0, Direction.Right)]
+    [InlineData(8, 0, Direction.Up, 3, 4, Direction.Down)]
+    [InlineData(8, 0, Direction.Left, 4, 4, Direction.Down)]
+    [InlineData(11, 2, Direction.Right, 15, 9, Direction.Left)]
+    [InlineData(0, 5, Direction.Left, 14, 11, Direction.Up)]
+    [InlineData(3, 4, Direction.Up, 8, 0, Direction.Down)]
+    [InlineData(1, 7, Direction.Down, 10, 11, Direction.Up)]
+    [InlineData(7, 4, Direction.Up, 8, 3, Direction.Right)]
+    [InlineData(4, 7, Direction.Down, 8, 11, Direction.Right)]
+    [InlineData(11, 5, Direction.Right, 14, 8, Direction.Down)]
+    [InlineData(8, 8, Direction.Left, 7, 7, Direction.Up)]
+    [InlineData(10, 11, Direction.Down, 1, 7, Direction.Up)]
+    [InlineData(14, 8, Direction.Up, 11, 5, Direction.Left)]
+    [InlineData(15, 10, Direction.Right, 11, 1, Direction.Left)]
+    [InlineData(14, 11, Direction.Down, 0, 5, Direction.Right)]
+    public void Can_get_next_cube_position(int X, int Y, Direction direction, int expectedX, int expectedY, Direction expectedDirection)
+    {
+      var input = "        ...#\r\n        .#..\r\n        #...\r\n        ....\r\n...#.......#\r\n........#...\r\n..#....#....\r\n..........#.\r\n        ...#....\r\n        .....#..\r\n        .#......\r\n        ......#.\r\n\r\n10R5L5R10L4R5L5\r\n";
+      var inp = Map.ParseInput(input, 4);
+      var pos = new Pos(X, Y);
+
+      var (nextPos, nextDirection) = inp.Board.GetAdjacentPositionCube(pos, direction);
+      nextPos.Should().Be(new Pos(expectedX, expectedY));
+      nextDirection.Should().Be(expectedDirection);
+    }
+
+    [Fact]
+    public void Can_get_final_player_cube()
+    {
+      var input = "        ...#\r\n        .#..\r\n        #...\r\n        ....\r\n...#.......#\r\n........#...\r\n..#....#....\r\n..........#.\r\n        ...#....\r\n        .....#..\r\n        .#......\r\n        ......#.\r\n\r\n10R5L5R10L4R5L5\r\n";
+      var player = Map.GetFinalPlayer(input, 4, true);
+      player.Pos.Should().Be(new Pos(6, 4));
+      player.Direction.Should().Be(Direction.Up);
+    }
+
+    [Fact]
+    public void Can_get_final_score_cube()
+    {
+      var input = "        ...#\r\n        .#..\r\n        #...\r\n        ....\r\n...#.......#\r\n........#...\r\n..#....#....\r\n..........#.\r\n        ...#....\r\n        .....#..\r\n        .#......\r\n        ......#.\r\n\r\n10R5L5R10L4R5L5\r\n";
+      var score = Map.GetFinalScore(input, 4, true);
+      score.Should().Be(5031);
     }
   }
 }

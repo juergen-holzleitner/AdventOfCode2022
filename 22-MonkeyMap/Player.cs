@@ -20,12 +20,19 @@
 
     public Pos Pos { get; private set; }
 
-    internal void DoInstruction(Instruction instruction)
+    internal void DoInstruction(Instruction instruction, bool useCube)
     {
       if (instruction is MoveInstruction move)
       {
         for (int n = 0; n < move.Num; ++n)
-          Pos = board.GetNextPosition(Pos, Direction);
+        {
+          if (useCube)
+          {
+            (Pos, Direction) = board.GetNextPositionCube(Pos, Direction);
+          }
+          else
+            Pos = board.GetNextPosition(Pos, Direction);
+        }
       }
       else if (instruction is TurnInstruction turn)
       {
@@ -64,5 +71,6 @@
       var score = 1000 * (Pos.Y + 1) + 4 * (Pos.X + 1) + GetDirectionScore(Direction);
       return score;
     }
+
   }
 }
