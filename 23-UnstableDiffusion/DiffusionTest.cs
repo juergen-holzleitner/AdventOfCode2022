@@ -128,5 +128,15 @@ namespace _23_UnstableDiffusion
 
       numFreePos.Should().Be(110);
     }
+
+    [Fact]
+    public void Can_get_num_moves_until_stable()
+    {
+      var input = "....#..\r\n..###.#\r\n#...#.#\r\n.#...##\r\n#.###..\r\n##.#.##\r\n.#..#..\r\n";
+
+      var numMoves = Diffusion.GetNumMovesUntilStable(input);
+
+      numMoves.Should().Be(20);
+    }
   }
 }

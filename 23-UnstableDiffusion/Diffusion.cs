@@ -41,14 +41,24 @@ namespace _23_UnstableDiffusion
 
   record ElveSetup(List<Elve> Elves)
   {
-    internal void MoveProposal()
+    internal bool MoveProposal()
     {
+      bool ret = true;
+
       foreach (var elve in Elves)
       {
         var numElves = Elves.Where(e => e.ProposedPos == elve.ProposedPos).Count();
         if (numElves == 1)
-          elve.CurrentPos = elve.ProposedPos;
+        {
+          if (elve.CurrentPos != elve.ProposedPos)
+          {
+            elve.CurrentPos = elve.ProposedPos;
+            ret = false;
+          }
+        }
       }
+
+      return ret;
     }
 
     internal void ProposePosition(InstructionList instructions)
@@ -151,6 +161,25 @@ namespace _23_UnstableDiffusion
 
       var boundingBox = elves.GetBoundingBox();
       return boundingBox.Width * boundingBox.Height - elves.Elves.Count;
+    }
+
+    internal static int GetNumMovesUntilStable(string input)
+    {
+      var elves = ParseInput(input);
+      var instructions = GetInstructions();
+
+      int numRounds = 0;
+
+      for (; ; )
+      {
+        ++numRounds;
+        elves.ProposePosition(instructions);
+        if (elves.MoveProposal())
+          break;
+        instructions.ScheduleNext();
+      }
+
+      return numRounds;
     }
 
     internal static ElveSetup ParseInput(string input)
