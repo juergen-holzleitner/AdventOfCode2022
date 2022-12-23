@@ -1,26 +1,90 @@
 ﻿
 namespace _22_MonkeyMap
 {
+  /*
+        1111
+        1111
+        1111
+        1111
+222233334444
+222233334444
+222233334444
+222233334444
+        55556666
+        55556666
+        55556666
+        55556666
+   */
+
+  /*
+      11112222
+      11112222
+      11112222
+      11112222
+      3333
+      3333
+      3333
+      3333
+  44445555
+  44445555
+  44445555
+  44445555
+  6666
+  6666
+  6666
+  6666
+  */
+
   enum Field { Empty, Open, Block };
 
   record Board(Field[,] Field, int CubeSize)
   {
-    internal int GetFace(Pos pos)
+    internal int GetFace(Pos pos, bool useReal)
     {
-      if (pos.Y < CubeSize)
-        return 1;
-      if (pos.Y < 2 * CubeSize)
+      var positions = GetFacePositions(useReal);
+
+      foreach (var entry in positions)
       {
-        if (pos.X < CubeSize)
-          return 2;
-        if (pos.X < 2 * CubeSize)
-          return 3;
-        return 4;
+        if (pos.X >= entry.Value.X * CubeSize
+          && pos.X < (entry.Value.X + 1) * CubeSize
+          && pos.Y >= entry.Value.Y * CubeSize
+          && pos.Y < (entry.Value.Y + 1) * CubeSize
+          )
+        {
+          return entry.Key;
+        }
       }
 
-      if (pos.X < 3 * CubeSize)
-        return 5;
-      return 6;
+      throw new ApplicationException("not expected");
+    }
+
+    private Dictionary<int, Pos> GetFacePositions(bool useReal)
+    {
+      return useReal ?
+                new Dictionary<int, Pos>()
+      {
+        {1, new Pos(1, 0)},
+        {2, new Pos(2, 0)},
+        {3, new Pos(1, 1)},
+        {4, new Pos(0, 2)},
+        {5, new Pos(1, 2)},
+        {6, new Pos(0, 3)},
+      } :
+        new Dictionary<int, Pos>()
+      {
+        {1, new Pos(2, 0)},
+        {2, new Pos(0, 1)},
+        {3, new Pos(1, 1)},
+        {4, new Pos(2, 1)},
+        {5, new Pos(2, 2)},
+        {6, new Pos(3, 2)},
+      };
+    }
+
+    internal Pos GetPosFromFace(int face, bool useReal)
+    {
+      var pos = GetFacePositions(useReal)[face];
+      return new Pos(pos.X * CubeSize, pos.Y * CubeSize);
     }
 
     internal Pos GetNextPosition(Pos pos, Direction direction)
@@ -57,25 +121,34 @@ namespace _22_MonkeyMap
 
     internal (Pos nextPos, Direction nextDirection) GetAdjacentPositionCube(Pos pos, Direction direction)
     {
+      return CubeSize == 50 ? GetAdjacentPositionCube50(pos, direction): GetAdjacentPositionCube4(pos, direction); ;
+    }
+
+    private (Pos nextPos, Direction nextDirection) GetAdjacentPositionCube4(Pos pos, Direction direction)
+    {
       var nextPos = GetNextPosition(pos, direction);
       var nextDirection = direction;
 
-      var face = GetFace(pos);
+      var xOffset = pos.X % CubeSize;
+      var yOffset = pos.Y % CubeSize;
+
+
+      var face = GetFace(pos, false);
       if (face == 1)
       {
-        if (pos.Y == 0 && direction == Direction.Up)
+        if (direction == Direction.Up && pos.IsBorder(direction, CubeSize))
         {
           nextDirection = Direction.Down;
           nextPos.Y = CubeSize;
           nextPos.X = CubeSize - 1 - (pos.X - 2 * CubeSize);
         }
-        if (pos.X == 2 * CubeSize && direction == Direction.Left)
+        if (direction == Direction.Left && pos.IsBorder(direction, CubeSize))
         {
           nextDirection = Direction.Down;
           nextPos.Y = CubeSize;
           nextPos.X = CubeSize + pos.Y;
         }
-        if (pos.X == 3 * CubeSize - 1 && direction == Direction.Right)
+        if (direction == Direction.Right && pos.IsBorder(direction, CubeSize))
         {
           nextDirection = Direction.Left;
           nextPos.X = 4 * CubeSize - 1;
@@ -84,19 +157,19 @@ namespace _22_MonkeyMap
       }
       if (face == 2)
       {
-        if (pos.X == 0 && direction == Direction.Left)
+        if (direction == Direction.Left && pos.IsBorder(direction, CubeSize))
         {
           nextDirection = Direction.Up;
           nextPos.Y = 3 * CubeSize - 1;
           nextPos.X = 4 * CubeSize - 1 - (pos.Y - CubeSize);
         }
-        if (pos.Y == CubeSize && direction == Direction.Up)
+        if (direction == Direction.Up && pos.IsBorder(direction, CubeSize))
         {
           nextDirection = Direction.Down;
           nextPos.Y = 0;
           nextPos.X = 2 * CubeSize + (CubeSize - 1 - pos.X);
         }
-        if (pos.Y == 2 * CubeSize - 1 && direction == Direction.Down)
+        if (direction == Direction.Down && pos.IsBorder(direction, CubeSize))
         {
           nextDirection = Direction.Up;
           nextPos.Y = 3 * CubeSize - 1;
@@ -105,13 +178,13 @@ namespace _22_MonkeyMap
       }
       if (face == 3)
       {
-        if (pos.Y == CubeSize && direction == Direction.Up)
+        if (direction == Direction.Up && pos.IsBorder(direction, CubeSize))
         {
           nextDirection = Direction.Right;
           nextPos.X = 2 * CubeSize;
           nextPos.Y = pos.X - CubeSize;
         }
-        if (pos.Y == 2 * CubeSize - 1 && direction == Direction.Down)
+        if (direction == Direction.Down && pos.IsBorder(direction, CubeSize))
         {
           nextDirection = Direction.Right;
           nextPos.X = 2 * CubeSize;
@@ -120,7 +193,7 @@ namespace _22_MonkeyMap
       }
       if (face == 4)
       {
-        if (pos.X == 3 * CubeSize - 1 && direction == Direction.Right)
+        if (direction == Direction.Right && pos.IsBorder(direction, CubeSize))
         {
           nextDirection = Direction.Down;
           nextPos.Y = 2 * CubeSize;
@@ -129,13 +202,13 @@ namespace _22_MonkeyMap
       }
       if (face == 5)
       {
-        if (pos.X == 2 * CubeSize && direction == Direction.Left)
+        if (direction == Direction.Left && pos.IsBorder(direction, CubeSize))
         {
           nextDirection = Direction.Up;
           nextPos.Y = 2 * CubeSize - 1;
           nextPos.X = 2 * CubeSize - 1 - (pos.Y - 2 * CubeSize);
         }
-        if (pos.Y == 3 * CubeSize - 1 && direction == Direction.Down)
+        if (direction == Direction.Down && pos.IsBorder(direction, CubeSize))
         {
           nextDirection = Direction.Up;
           nextPos.Y = 2 * CubeSize - 1;
@@ -144,23 +217,148 @@ namespace _22_MonkeyMap
       }
       if (face == 6)
       {
-        if (pos.Y == 2 * CubeSize && direction == Direction.Up)
+        if (direction == Direction.Up && pos.IsBorder(direction, CubeSize))
         {
           nextDirection = Direction.Left;
           nextPos.X = 3 * CubeSize - 1;
           nextPos.Y = CubeSize + (4 * CubeSize - 1 - pos.X);
         }
-        if (pos.X == 4 * CubeSize - 1 && direction == Direction.Right)
+        if (direction == Direction.Right && pos.IsBorder(direction, CubeSize))
         {
           nextDirection = Direction.Left;
           nextPos.X = 3 * CubeSize - 1;
           nextPos.Y = 3 * CubeSize - 1 - pos.Y;
         }
-        if (pos.Y == 3 * CubeSize - 1 && direction == Direction.Down)
+        if (direction == Direction.Down && pos.IsBorder(direction, CubeSize))
         {
           nextDirection = Direction.Right;
           nextPos.X = 0;
           nextPos.Y = CubeSize + (4 * CubeSize - 1 - pos.X);
+        }
+      }
+
+      return (nextPos, nextDirection);
+    }
+
+    public (Pos nextPos, Direction nextDirection) GetAdjacentPositionCube50(Pos pos, Direction direction)
+    {
+      var nextPos = GetNextPosition(pos, direction);
+      var nextDirection = direction;
+
+      var offsetX = pos.X % CubeSize;
+      var offsetY = pos.Y % CubeSize;
+
+
+      var face = GetFace(pos, true);
+      if (face == 1)
+      {
+        if (direction == Direction.Left && pos.IsBorder(direction, CubeSize))
+        {
+          nextDirection = Direction.Right;
+          nextPos = GetPosFromFace(4, true);
+          nextPos.Y += CubeSize - 1 - offsetY;
+        }
+        if (direction == Direction.Up && pos.IsBorder(direction, CubeSize))
+        {
+          nextDirection = Direction.Right;
+          nextPos = GetPosFromFace(6, true);
+          nextPos.Y += offsetX;
+        }
+      }
+      if (face == 2)
+      {
+        if (direction == Direction.Down && pos.IsBorder(direction, CubeSize))
+        {
+          nextDirection = Direction.Left;
+          nextPos = GetPosFromFace(3, true);
+          nextPos.X += CubeSize - 1;
+          nextPos.Y += offsetX;
+        }
+        if (direction == Direction.Up && pos.IsBorder(direction, CubeSize))
+        {
+          nextDirection = Direction.Up;
+          nextPos = GetPosFromFace(6, true);
+          nextPos.Y += CubeSize - 1;
+          nextPos.X += offsetX;
+        }
+        if (direction == Direction.Right && pos.IsBorder(direction, CubeSize))
+        {
+          nextDirection = Direction.Left;
+          nextPos = GetPosFromFace(5, true);
+          nextPos.X += CubeSize - 1;
+          nextPos.Y += CubeSize - 1 - offsetY;
+        }
+      }
+      if (face == 3)
+      {
+        if (direction == Direction.Left && pos.IsBorder(direction, CubeSize))
+        {
+          nextDirection = Direction.Down;
+          nextPos = GetPosFromFace(4, true);
+          nextPos.X += offsetY;
+        }
+        if (direction == Direction.Right && pos.IsBorder(direction, CubeSize))
+        {
+          nextDirection = Direction.Up;
+          nextPos = GetPosFromFace(2, true);
+          nextPos.X += offsetY;
+          nextPos.Y += CubeSize - 1;
+        }
+      }
+      if (face == 4)
+      {
+        if (direction == Direction.Up && pos.IsBorder(direction, CubeSize))
+        {
+          nextDirection = Direction.Right;
+          nextPos = GetPosFromFace(3, true);
+          nextPos.Y += offsetX;
+        }
+        if (direction == Direction.Left && pos.IsBorder(direction, CubeSize))
+        {
+          nextDirection = Direction.Right;
+          nextPos = GetPosFromFace(1, true);
+          nextPos.Y += CubeSize - 1 - offsetY;
+        }
+      }
+      if (face == 5)
+      {
+        if (direction == Direction.Down && pos.IsBorder(direction, CubeSize))
+        {
+          nextDirection = Direction.Left;
+          nextPos = GetPosFromFace(6, true);
+          nextPos.X += CubeSize - 1;
+          nextPos.Y += offsetX;
+        }
+        if (direction == Direction.Right && pos.IsBorder(direction, CubeSize))
+        {
+          nextDirection = Direction.Left;
+          nextPos = GetPosFromFace(2, true);
+          nextPos.X += CubeSize - 1;
+          nextPos.Y += CubeSize - 1 - offsetY;
+        }
+      }
+      if (face == 6)
+      {
+        if (direction == Direction.Right && pos.IsBorder(direction, CubeSize))
+        {
+          nextDirection = Direction.Up;
+          nextPos = GetPosFromFace(5, true);
+          nextPos.Y += CubeSize - 1;
+          nextPos.X += offsetY;
+        }
+
+        if (direction == Direction.Left && pos.IsBorder(direction, CubeSize))
+        {
+          nextDirection = Direction.Down;
+          nextPos = GetPosFromFace(1, true);
+          nextPos.X += offsetY;
+        }
+
+        if (direction == Direction.Down && pos.IsBorder(direction, CubeSize))
+        {
+          nextDirection = Direction.Down;
+          nextPos = GetPosFromFace(2, true);
+          nextPos.X += offsetX;
         }
       }
 

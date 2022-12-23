@@ -134,7 +134,7 @@ namespace _22_MonkeyMap
     }
 
     [Theory]
-    [InlineData(7, 0, 1)]
+    [InlineData(8, 0, 1)]
     [InlineData(0, 7, 2)]
     [InlineData(7, 4, 3)]
     [InlineData(8, 4, 4)]
@@ -146,7 +146,7 @@ namespace _22_MonkeyMap
       var inp = Map.ParseInput(input, 4);
       var pos = new Pos(X, Y);
 
-      var face = inp.Board.GetFace(pos);
+      var face = inp.Board.GetFace(pos, false);
 
       face.Should().Be(expectedFace);
     }
@@ -174,6 +174,32 @@ namespace _22_MonkeyMap
       var pos = new Pos(X, Y);
 
       var (nextPos, nextDirection) = inp.Board.GetAdjacentPositionCube(pos, direction);
+      nextPos.Should().Be(new Pos(expectedX, expectedY));
+      nextDirection.Should().Be(expectedDirection);
+    }
+
+    [Theory]
+    [InlineData(4, 4, Direction.Left, 0, 8, Direction.Down)] // 3 left
+    [InlineData(3, 8, Direction.Up, 4, 7, Direction.Right)] // 4 up
+    [InlineData(8, 3, Direction.Down, 7, 4, Direction.Left)] // 2 down
+    [InlineData(7, 7, Direction.Right, 11, 3, Direction.Up)] // 3 right
+    [InlineData(4, 11, Direction.Down, 3, 12, Direction.Left)] // 5 down
+    [InlineData(3, 15, Direction.Right, 7, 11, Direction.Up)] // 6 right
+    [InlineData(4, 0, Direction.Left, 0, 11, Direction.Right)] // 1 left
+    [InlineData(0, 8, Direction.Left, 4, 3, Direction.Right)] // 4 left
+    [InlineData(4, 0, Direction.Up, 0, 12, Direction.Right)] // 1 up
+    [InlineData(0, 15, Direction.Left, 7, 0, Direction.Down)] // 6 left
+    [InlineData(0, 15, Direction.Down, 8, 0, Direction.Down)] // 6 down
+    [InlineData(11, 0, Direction.Up, 3, 15, Direction.Up)] // 2 up
+    [InlineData(11, 0, Direction.Right, 7, 11, Direction.Left)] // 2 right
+    [InlineData(7, 8, Direction.Right, 11, 3, Direction.Left)] // 5 right
+    public void Can_get_next_cube_position_50(int X, int Y, Direction direction, int expectedX, int expectedY, Direction expectedDirection)
+    {
+      var input = "    ........\r\n    ........\r\n    ........\r\n    ........\r\n    ....\r\n    ....\r\n    ....\r\n    ....\r\n........\r\n........\r\n........\r\n........\r\n....\r\n....\r\n....\r\n....";
+      var inp = Map.ParseInput(input, 4);
+      var pos = new Pos(X, Y);
+
+      var (nextPos, nextDirection) = inp.Board.GetAdjacentPositionCube50(pos, direction);
       nextPos.Should().Be(new Pos(expectedX, expectedY));
       nextDirection.Should().Be(expectedDirection);
     }

@@ -1,9 +1,23 @@
-﻿namespace _22_MonkeyMap
+﻿using System.Reflection.Metadata.Ecma335;
+
+namespace _22_MonkeyMap
 {
   record struct Pos(int X, int Y)
   {
     public int X { get; set; } = X;
     public int Y { get; set; } = Y;
+
+    internal bool IsBorder(Direction direction, int cubeSize)
+    {
+      return direction switch
+      {
+        Direction.Up when Y % cubeSize == 0 => true,
+        Direction.Left when X % cubeSize == 0 => true,
+        Direction.Down when (Y + 1) % cubeSize == 0 => true,
+        Direction.Right when (X + 1) % cubeSize == 0 => true,
+        _ => false
+      };
+    }
   }
 
   internal class Player
