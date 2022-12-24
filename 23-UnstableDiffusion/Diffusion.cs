@@ -14,6 +14,8 @@ namespace _23_UnstableDiffusion
   {
     public Pos CurrentPos { get; set; } = CurrentPos;
     public Pos ProposedPos { get; set; } = ProposedPos;
+
+    public bool ShouldMove { get; set; }
   }
 
   record Instruction(Pos MoveOffset, Pos[] CheckPositions);
@@ -39,40 +41,58 @@ namespace _23_UnstableDiffusion
     public int Height { get => Bottom - Top + 1; }
   }
 
-  record ElveSetup(List<Elve> Elves)
+  record ElveSetup(Dictionary<Pos, Elve> Elves)
   {
+    public Dictionary<Pos, Elve> Elves { get; set; } = Elves;
+
     internal bool MoveProposal()
     {
       bool ret = true;
 
+      var newDictionary = new Dictionary<Pos, Elve>();
+
       foreach (var elve in Elves)
       {
-        var numElves = Elves.Where(e => e.ProposedPos == elve.ProposedPos).Count();
-        if (numElves == 1)
+        if (elve.Value.ShouldMove)
         {
-          if (elve.CurrentPos != elve.ProposedPos)
-          {
-            elve.CurrentPos = elve.ProposedPos;
-            ret = false;
-          }
+          var newElve = elve.Value;
+          newElve.CurrentPos = newElve.ProposedPos;
+          newDictionary.Add(newElve.CurrentPos, newElve);
+          ret = false;
         }
+        else
+          newDictionary.Add(elve.Value.CurrentPos, elve.Value);
       }
+
+      Elves = newDictionary;
 
       return ret;
     }
 
     internal void ProposePosition(InstructionList instructions)
     {
+      var proposedPositions = new Dictionary<Pos, Elve>();
+
       foreach (var elve in Elves)
       {
-        elve.ProposedPos = elve.CurrentPos;
-        if (HasNeighbours(elve.CurrentPos))
+        elve.Value.ShouldMove = false;
+        if (HasNeighbours(elve.Value.CurrentPos))
         {
           foreach (var instruction in instructions.Instructions)
           {
-            if (AreAllCheckPositionsFree(elve.CurrentPos, instruction.CheckPositions))
+            if (AreAllCheckPositionsFree(elve.Value.CurrentPos, instruction.CheckPositions))
             {
-              elve.ProposedPos = elve.CurrentPos.Move(instruction.MoveOffset);
+              elve.Value.ProposedPos = elve.Value.CurrentPos.Move(instruction.MoveOffset);
+
+              if (proposedPositions.TryGetValue(elve.Value.ProposedPos, out Elve? value))
+              {
+                value.ShouldMove = false;
+              }
+              else
+              {
+                elve.Value.ShouldMove = true;
+                proposedPositions.Add(elve.Value.ProposedPos, elve.Value);
+              }
               break;
             }
           }
@@ -112,13 +132,15 @@ namespace _23_UnstableDiffusion
 
     private bool IsPositionFree(Pos pos)
     {
-      return !Elves.Any(e => e.CurrentPos == pos);
+      return !Elves.ContainsKey(pos);
     }
 
     internal BoundingBox GetBoundingBox()
     {
-      var boundingBox = new BoundingBox(Elves.First().CurrentPos.X, Elves.First().CurrentPos.X, Elves.First().CurrentPos.Y, Elves.First().CurrentPos.Y);
-      foreach (var elve in Elves)
+      var firstElvePos = Elves.First().Value.CurrentPos;
+      var boundingBox = new BoundingBox(firstElvePos.X, firstElvePos.X, firstElvePos.Y, firstElvePos.Y);
+
+      foreach (var elve in Elves.Values)
       {
         if (elve.CurrentPos.X < boundingBox.Left)
           boundingBox.Left = elve.CurrentPos.X;
@@ -184,7 +206,7 @@ namespace _23_UnstableDiffusion
 
     internal static ElveSetup ParseInput(string input)
     {
-      var elves = new List<Elve>();
+      var elves = new Dictionary<Pos, Elve>();
       int y = 0;
       foreach (var line in input.Split('\n'))
       {
@@ -192,7 +214,10 @@ namespace _23_UnstableDiffusion
         foreach (var ch in line)
         {
           if (ch == '#')
-            elves.Add(new Elve(new Pos(x, y), new Pos()));
+          {
+            var pos = new Pos(x, y);
+            elves.Add(pos, new Elve(pos, new Pos()));
+          }
           ++x;
         }
         ++y;

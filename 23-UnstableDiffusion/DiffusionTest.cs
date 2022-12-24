@@ -12,9 +12,9 @@ namespace _23_UnstableDiffusion
       
       var elves = Diffusion.ParseInput(input);
 
-      elves.Elves.Should().HaveCount(22);
-      elves.Elves.Should().Contain(e => e.CurrentPos == new Pos(4, 0));
-      elves.Elves.Should().Contain(e => e.CurrentPos == new Pos(6, 5));
+      elves.Elves.Values.Should().HaveCount(22);
+      elves.Elves.Values.Should().Contain(e => e.CurrentPos == new Pos(4, 0));
+      elves.Elves.Values.Should().Contain(e => e.CurrentPos == new Pos(6, 5));
     }
 
     [Fact]
@@ -55,11 +55,11 @@ namespace _23_UnstableDiffusion
 
       elves.ProposePosition(instructions);
 
-      elves.Elves.Should().Contain(e => e.CurrentPos == new Pos(2, 1) && e.ProposedPos == new Pos(2, 0));
-      elves.Elves.Should().Contain(e => e.CurrentPos == new Pos(3, 1) && e.ProposedPos == new Pos(3, 0));
-      elves.Elves.Should().Contain(e => e.CurrentPos == new Pos(2, 2) && e.ProposedPos == new Pos(2, 3));
-      elves.Elves.Should().Contain(e => e.CurrentPos == new Pos(2, 4) && e.ProposedPos == new Pos(2, 3));
-      elves.Elves.Should().Contain(e => e.CurrentPos == new Pos(3, 4) && e.ProposedPos == new Pos(3, 3));
+      elves.Elves.Values.Should().Contain(e => e.CurrentPos == new Pos(2, 1) && e.ProposedPos == new Pos(2, 0));
+      elves.Elves.Values.Should().Contain(e => e.CurrentPos == new Pos(3, 1) && e.ProposedPos == new Pos(3, 0));
+      elves.Elves.Values.Should().Contain(e => e.CurrentPos == new Pos(2, 2) && e.ProposedPos == new Pos(2, 3));
+      elves.Elves.Values.Should().Contain(e => e.CurrentPos == new Pos(2, 4) && e.ProposedPos == new Pos(2, 3));
+      elves.Elves.Values.Should().Contain(e => e.CurrentPos == new Pos(3, 4) && e.ProposedPos == new Pos(3, 3));
     }
 
     [Fact]
@@ -72,11 +72,11 @@ namespace _23_UnstableDiffusion
       
       elves.MoveProposal();
 
-      elves.Elves.Should().Contain(e => e.CurrentPos == new Pos(2, 0));
-      elves.Elves.Should().Contain(e => e.CurrentPos == new Pos(3, 0));
-      elves.Elves.Should().Contain(e => e.CurrentPos == new Pos(2, 2));
-      elves.Elves.Should().Contain(e => e.CurrentPos == new Pos(3, 3));
-      elves.Elves.Should().Contain(e => e.CurrentPos == new Pos(2, 4));
+      elves.Elves.Values.Should().Contain(e => e.CurrentPos == new Pos(2, 0));
+      elves.Elves.Values.Should().Contain(e => e.CurrentPos == new Pos(3, 0));
+      elves.Elves.Values.Should().Contain(e => e.CurrentPos == new Pos(2, 2));
+      elves.Elves.Values.Should().Contain(e => e.CurrentPos == new Pos(3, 3));
+      elves.Elves.Values.Should().Contain(e => e.CurrentPos == new Pos(2, 4));
     }
 
     [Fact]
@@ -93,11 +93,11 @@ namespace _23_UnstableDiffusion
         instructions.ScheduleNext();
       }
 
-      elves.Elves.Should().Contain(e => e.CurrentPos == new Pos(2, 0));
-      elves.Elves.Should().Contain(e => e.CurrentPos == new Pos(4, 1));
-      elves.Elves.Should().Contain(e => e.CurrentPos == new Pos(0, 2));
-      elves.Elves.Should().Contain(e => e.CurrentPos == new Pos(4, 3));
-      elves.Elves.Should().Contain(e => e.CurrentPos == new Pos(2, 5));
+      elves.Elves.Values.Should().Contain(e => e.CurrentPos == new Pos(2, 0));
+      elves.Elves.Values.Should().Contain(e => e.CurrentPos == new Pos(4, 1));
+      elves.Elves.Values.Should().Contain(e => e.CurrentPos == new Pos(0, 2));
+      elves.Elves.Values.Should().Contain(e => e.CurrentPos == new Pos(4, 3));
+      elves.Elves.Values.Should().Contain(e => e.CurrentPos == new Pos(2, 5));
     }
 
     [Fact]
