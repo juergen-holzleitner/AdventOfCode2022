@@ -251,5 +251,38 @@ namespace _24_BlizzardBasin
         _ => throw new ApplicationException("invalid direction")
       };
     }
+
+    internal static int GetNumStepsToExitBackAndExitAgain(string text)
+    {
+      var blizzardMap = Parse(text);
+
+      int numSteps = 0;
+
+      var playerPositions = new HashSet<Pos> { blizzardMap.StartPos };
+      while (!playerPositions.Contains(blizzardMap.EndPos))
+      {
+        blizzardMap.SingleStep();
+        playerPositions = blizzardMap.GetNextPlayerPositions(playerPositions, blizzardMap);
+        ++numSteps;
+      }
+
+      playerPositions = new() { blizzardMap.EndPos };
+      while (!playerPositions.Contains(blizzardMap.StartPos))
+      {
+        blizzardMap.SingleStep();
+        playerPositions = blizzardMap.GetNextPlayerPositions(playerPositions, blizzardMap);
+        ++numSteps;
+      }
+
+      playerPositions = new () { blizzardMap.StartPos };
+      while (!playerPositions.Contains(blizzardMap.EndPos))
+      {
+        blizzardMap.SingleStep();
+        playerPositions = blizzardMap.GetNextPlayerPositions(playerPositions, blizzardMap);
+        ++numSteps;
+      }
+
+      return numSteps;
+    }
   }
 }

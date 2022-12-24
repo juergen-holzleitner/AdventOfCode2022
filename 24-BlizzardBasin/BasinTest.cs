@@ -88,5 +88,15 @@ namespace _24_BlizzardBasin
       numSteps.Should().Be(18);
     }
 
+    [Fact]
+    public void Can_get_num_steps_for_second_part()
+    {
+      var text = "#E######\r\n#>>.<^<#\r\n#.<..<<#\r\n#>v.><>#\r\n#<^v^^>#\r\n######.#";
+
+      var numSteps = Blizzard.GetNumStepsToExitBackAndExitAgain(text);
+
+      numSteps.Should().Be(54);
+    }
+
   }
 }
