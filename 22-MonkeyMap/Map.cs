@@ -58,7 +58,7 @@ namespace _22_MonkeyMap
       throw new ApplicationException("not expected");
     }
 
-    private Dictionary<int, Pos> GetFacePositions(bool useReal)
+    private static Dictionary<int, Pos> GetFacePositions(bool useReal)
     {
       return useReal ?
                 new Dictionary<int, Pos>()
@@ -128,10 +128,6 @@ namespace _22_MonkeyMap
     {
       var nextPos = GetNextPosition(pos, direction);
       var nextDirection = direction;
-
-      var xOffset = pos.X % CubeSize;
-      var yOffset = pos.Y % CubeSize;
-
 
       var face = GetFace(pos, false);
       if (face == 1)
@@ -538,5 +534,64 @@ namespace _22_MonkeyMap
         _ => throw new ApplicationException("unexpected char " + field)
       };
     }
+
+    internal static CubeSetup FoldToCube(Board board, Pos topLeft2DPos)
+    {
+      var faces = new Dictionary<Vector, CubeFace>();
+      var faceVector = new FaceVector(new Vector(0, 1, 0), new Vector(1, 0, 0), new Vector(0, 0, -1));
+
+      AddCubeFace(faces, topLeft2DPos, faceVector, board);
+
+      return new CubeSetup(faces);
+    }
+
+    private static void AddCubeFace(Dictionary<Vector, CubeFace> faces, Pos topLeft2DPos, FaceVector faceVector, Board board)
+    {
+      if (faces.ContainsKey(faceVector.NormalVector))
+        return;
+
+      if (topLeft2DPos.X < 0 || topLeft2DPos.X >= board.Field.GetLength(0))
+        return;
+
+      if (topLeft2DPos.Y < 0 || topLeft2DPos.Y >= board.Field.GetLength(1))
+        return;
+
+      if (board.Field[topLeft2DPos.X, topLeft2DPos.Y] == Field.Empty)
+        return;
+
+      faces.Add(faceVector.NormalVector, new CubeFace(topLeft2DPos));
+
+      foreach (var direction in Enum.GetValues<Direction>())
+      {
+        var nextFaceVector = RotateNormalVector(faceVector, direction);
+        AddCubeFace(faces, topLeft2DPos.Move(direction, board.CubeSize), nextFaceVector, board);
+      }
+    }
+
+    private static FaceVector RotateNormalVector(FaceVector faceVector, Direction direction)
+    {
+      return direction switch
+      {
+        Direction.Left => new FaceVector(NegateVector(faceVector.X), faceVector.NormalVector, faceVector.Y),
+        Direction.Right => new FaceVector(faceVector.X, NegateVector(faceVector.NormalVector), faceVector.Y),
+        Direction.Up => new FaceVector(NegateVector(faceVector.Y), faceVector.X, faceVector.NormalVector),
+        Direction.Down => new FaceVector(faceVector.Y, faceVector.X, NegateVector(faceVector.NormalVector)),
+        _ => throw new ApplicationException()
+      };
+    }
+
+    private static Vector NegateVector(Vector x)
+    {
+      return new Vector(-x.X, -x.Y, -x.Z);
+    }
   }
+
+  record CubeFace(Pos TopLeft2DPos);
+
+  record struct Vector(int X, int Y, int Z);
+
+  record struct FaceVector(Vector NormalVector, Vector X, Vector Y);
+
+  record CubeSetup(Dictionary<Vector, CubeFace> Faces);
+
 }

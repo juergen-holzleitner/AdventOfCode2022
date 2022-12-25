@@ -220,5 +220,39 @@ namespace _22_MonkeyMap
       var score = Map.GetFinalScore(input, 4, true);
       score.Should().Be(5031);
     }
+
+    [Fact]
+    public void Can_fold_cube_from_example()
+    {
+      var text = "        ...#\r\n        .#..\r\n        #...\r\n        ....\r\n...#.......#\r\n........#...\r\n..#....#....\r\n..........#.\r\n        ...#....\r\n        .....#..\r\n        .#......\r\n        ......#.\r\n\r\n10R5L5R10L4R5L5\r\n";
+      var input = Map.ParseInput(text, 4);
+      var player = new Player(input.Board);
+      player.Pos.Should().Be(new Pos(8, 0));
+
+      var cubeSetup = Map.FoldToCube(input.Board, player.Pos);
+      cubeSetup.Faces.Should().Contain(f => f.Key == new Vector(0, 1, 0) && f.Value.TopLeft2DPos == new Pos(8, 0)); // top
+      cubeSetup.Faces.Should().Contain(f => f.Key == new Vector(0, 0, -1) && f.Value.TopLeft2DPos == new Pos(8, 4)); // front
+      cubeSetup.Faces.Should().Contain(f => f.Key == new Vector(0, 0, 1) && f.Value.TopLeft2DPos == new Pos(0, 4)); // back
+      cubeSetup.Faces.Should().Contain(f => f.Key == new Vector(0, -1, 0) && f.Value.TopLeft2DPos == new Pos(8, 8)); // bottom
+      cubeSetup.Faces.Should().Contain(f => f.Key == new Vector(-1, 0, 0) && f.Value.TopLeft2DPos == new Pos(4, 4)); // left
+      cubeSetup.Faces.Should().Contain(f => f.Key == new Vector(1, 0, 0) && f.Value.TopLeft2DPos == new Pos(12, 8)); // right
+    }
+
+    [Fact]
+    public void Can_fold_cube_from_part2()
+    {
+      var text = "    ........\r\n    ........\r\n    ........\r\n    ........\r\n    ....\r\n    ....\r\n    ....\r\n    ....\r\n........\r\n........\r\n........\r\n........\r\n....\r\n....\r\n....\r\n....";
+      var input = Map.ParseInput(text, 4);
+      var player = new Player(input.Board);
+      player.Pos.Should().Be(new Pos(4, 0));
+
+      var cubeSetup = Map.FoldToCube(input.Board, player.Pos);
+      cubeSetup.Faces.Should().Contain(f => f.Key == new Vector(0, 1, 0) && f.Value.TopLeft2DPos == new Pos(4, 0)); // top
+      cubeSetup.Faces.Should().Contain(f => f.Key == new Vector(0, 0, -1) && f.Value.TopLeft2DPos == new Pos(4, 4)); // front
+      cubeSetup.Faces.Should().Contain(f => f.Key == new Vector(0, 0, 1) && f.Value.TopLeft2DPos == new Pos(0, 12)); // back
+      cubeSetup.Faces.Should().Contain(f => f.Key == new Vector(0, -1, 0) && f.Value.TopLeft2DPos == new Pos(4, 8)); // bottom
+      cubeSetup.Faces.Should().Contain(f => f.Key == new Vector(-1, 0, 0) && f.Value.TopLeft2DPos == new Pos(0, 8)); // left
+      cubeSetup.Faces.Should().Contain(f => f.Key == new Vector(1, 0, 0) && f.Value.TopLeft2DPos == new Pos(8, 0)); // right
+    }
   }
 }

@@ -18,6 +18,18 @@ namespace _22_MonkeyMap
         _ => false
       };
     }
+
+    internal Pos Move(Direction direction, int size)
+    {
+      return direction switch
+      {
+        Direction.Left => new Pos(X - size, Y),
+        Direction.Right => new Pos(X + size, Y),
+        Direction.Up => new Pos(X, Y - size),
+        Direction.Down => new Pos(X, Y + size),
+        _ => throw new ApplicationException()
+      };
+    }
   }
 
   internal class Player
