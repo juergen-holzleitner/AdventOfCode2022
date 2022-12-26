@@ -1,6 +1,4 @@
-﻿using System.Reflection.Metadata.Ecma335;
-
-namespace _22_MonkeyMap
+﻿namespace _22_MonkeyMap
 {
   record struct Pos(int X, int Y)
   {
@@ -19,6 +17,18 @@ namespace _22_MonkeyMap
       };
     }
 
+    internal bool IsLocalBorder(Direction direction, int cubeSize)
+    {
+      return direction switch
+      {
+        Direction.Up when Y == 0 => true,
+        Direction.Left when X == 0 => true,
+        Direction.Down when Y == cubeSize - 1 => true,
+        Direction.Right when X == cubeSize - 1 => true,
+        _ => false
+      };
+    }
+
     internal Pos Move(Direction direction, int size)
     {
       return direction switch
@@ -30,16 +40,30 @@ namespace _22_MonkeyMap
         _ => throw new ApplicationException()
       };
     }
+
+    internal Pos TransformLocalBorder(Direction direction, int cubeSize)
+    {
+      return direction switch
+      {
+        Direction.Left => new Pos(cubeSize - 1, Y),
+        Direction.Right => new Pos(0, Y),
+        Direction.Up => new Pos(X, cubeSize - 1),
+        Direction.Down => new Pos(X, 0),
+        _ => throw new ApplicationException()
+      };
+    }
   }
 
   internal class Player
   {
     private Board board;
+    private CubeSetup cubeSetup;
 
-    public Player(Board board)
+    public Player(Board board, Pos pos)
     {
       this.board = board;
-      Pos = board.GetNextPosition(new Pos(0, 0), Direction.Right);
+      cubeSetup = Map.FoldToCube(board, pos);
+      Pos = pos;
     }
 
     public Direction Direction { get; private set; } = Direction.Right;
@@ -53,9 +77,7 @@ namespace _22_MonkeyMap
         for (int n = 0; n < move.Num; ++n)
         {
           if (useCube)
-          {
-            (Pos, Direction) = board.GetNextPositionCube(Pos, Direction);
-          }
+            (Pos, Direction) = board.GetNextPositionCube(Pos, Direction, cubeSetup);
           else
             Pos = board.GetNextPosition(Pos, Direction);
         }

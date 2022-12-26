@@ -103,9 +103,14 @@ namespace _22_MonkeyMap
       return nextPos;
     }
 
-    internal (Pos pos, Direction direction) GetNextPositionCube(Pos pos, Direction direction)
+    internal Pos GetStartPosition()
     {
-      var (nextPos, nextDirection) = GetAdjacentPositionCube(pos, direction);
+      return GetNextPosition(new Pos(0, 0), Direction.Right);
+    }
+
+    internal (Pos pos, Direction direction) GetNextPositionCube(Pos pos, Direction direction, CubeSetup cubeSetup)
+    {
+      var (nextPos, nextDirection) = GetAdjacentPositionCube(pos, direction, cubeSetup);
 
       if (Field[nextPos.X, nextPos.Y] == _22_MonkeyMap.Field.Empty)
         throw new ApplicationException("not expected");
@@ -119,246 +124,83 @@ namespace _22_MonkeyMap
       return (nextPos, nextDirection);
     }
 
-    internal (Pos nextPos, Direction nextDirection) GetAdjacentPositionCube(Pos pos, Direction direction)
+    internal (Pos nextPos, Direction nextDirection) GetAdjacentPositionCube(Pos pos, Direction direction, CubeSetup cubeSetup)
     {
-      return CubeSize == 50 ? GetAdjacentPositionCube50(pos, direction): GetAdjacentPositionCube4(pos, direction); ;
-    }
-
-    private (Pos nextPos, Direction nextDirection) GetAdjacentPositionCube4(Pos pos, Direction direction)
-    {
-      var nextPos = GetNextPosition(pos, direction);
+      var nextPos = pos.Move(direction, 1);
       var nextDirection = direction;
 
-      var face = GetFace(pos, false);
-      if (face == 1)
+      var face = GetFaceAt(cubeSetup, pos);
+      var localPos = GetLocalPos(pos, face);
+
+      if (localPos.IsLocalBorder(direction, CubeSize))
       {
-        if (direction == Direction.Up && pos.IsBorder(direction, CubeSize))
+        var targetFaceVector = Map.RotateFaceVector(face.FaceVector, direction);
+        var targetFace = GetFaceAt(cubeSetup, targetFaceVector.NormalVector);
+        var transformedPos = localPos.TransformLocalBorder(direction, CubeSize);
+
+        int numSteps = 0;
+        while (targetFaceVector.X != targetFace.FaceVector.X)
         {
-          nextDirection = Direction.Down;
-          nextPos.Y = CubeSize;
-          nextPos.X = CubeSize - 1 - (pos.X - 2 * CubeSize);
+          if (targetFaceVector.Y == targetFace.FaceVector.Y)
+            throw new ApplicationException();
+
+          ++numSteps;
+          if (numSteps >= 4)
+            throw new ApplicationException();
+
+          targetFaceVector = RotateFaceVectorClockwise(targetFaceVector);
+          nextDirection = RotateDirectionCounterClockwise(nextDirection);
+          transformedPos = RotatePosCounterClockwise(transformedPos);
         }
-        if (direction == Direction.Left && pos.IsBorder(direction, CubeSize))
-        {
-          nextDirection = Direction.Down;
-          nextPos.Y = CubeSize;
-          nextPos.X = CubeSize + pos.Y;
-        }
-        if (direction == Direction.Right && pos.IsBorder(direction, CubeSize))
-        {
-          nextDirection = Direction.Left;
-          nextPos.X = 4 * CubeSize - 1;
-          nextPos.Y = 3 * CubeSize - 1 - pos.Y;
-        }
-      }
-      if (face == 2)
-      {
-        if (direction == Direction.Left && pos.IsBorder(direction, CubeSize))
-        {
-          nextDirection = Direction.Up;
-          nextPos.Y = 3 * CubeSize - 1;
-          nextPos.X = 4 * CubeSize - 1 - (pos.Y - CubeSize);
-        }
-        if (direction == Direction.Up && pos.IsBorder(direction, CubeSize))
-        {
-          nextDirection = Direction.Down;
-          nextPos.Y = 0;
-          nextPos.X = 2 * CubeSize + (CubeSize - 1 - pos.X);
-        }
-        if (direction == Direction.Down && pos.IsBorder(direction, CubeSize))
-        {
-          nextDirection = Direction.Up;
-          nextPos.Y = 3 * CubeSize - 1;
-          nextPos.X = 3 * CubeSize - 1 - pos.X;
-        }
-      }
-      if (face == 3)
-      {
-        if (direction == Direction.Up && pos.IsBorder(direction, CubeSize))
-        {
-          nextDirection = Direction.Right;
-          nextPos.X = 2 * CubeSize;
-          nextPos.Y = pos.X - CubeSize;
-        }
-        if (direction == Direction.Down && pos.IsBorder(direction, CubeSize))
-        {
-          nextDirection = Direction.Right;
-          nextPos.X = 2 * CubeSize;
-          nextPos.Y = 3 * CubeSize - 1 - (pos.X - CubeSize);
-        }
-      }
-      if (face == 4)
-      {
-        if (direction == Direction.Right && pos.IsBorder(direction, CubeSize))
-        {
-          nextDirection = Direction.Down;
-          nextPos.Y = 2 * CubeSize;
-          nextPos.X = 3 * CubeSize + (2 * CubeSize - 1 - pos.Y);
-        }
-      }
-      if (face == 5)
-      {
-        if (direction == Direction.Left && pos.IsBorder(direction, CubeSize))
-        {
-          nextDirection = Direction.Up;
-          nextPos.Y = 2 * CubeSize - 1;
-          nextPos.X = 2 * CubeSize - 1 - (pos.Y - 2 * CubeSize);
-        }
-        if (direction == Direction.Down && pos.IsBorder(direction, CubeSize))
-        {
-          nextDirection = Direction.Up;
-          nextPos.Y = 2 * CubeSize - 1;
-          nextPos.X = 3 * CubeSize - 1 - pos.X;
-        }
-      }
-      if (face == 6)
-      {
-        if (direction == Direction.Up && pos.IsBorder(direction, CubeSize))
-        {
-          nextDirection = Direction.Left;
-          nextPos.X = 3 * CubeSize - 1;
-          nextPos.Y = CubeSize + (4 * CubeSize - 1 - pos.X);
-        }
-        if (direction == Direction.Right && pos.IsBorder(direction, CubeSize))
-        {
-          nextDirection = Direction.Left;
-          nextPos.X = 3 * CubeSize - 1;
-          nextPos.Y = 3 * CubeSize - 1 - pos.Y;
-        }
-        if (direction == Direction.Down && pos.IsBorder(direction, CubeSize))
-        {
-          nextDirection = Direction.Right;
-          nextPos.X = 0;
-          nextPos.Y = CubeSize + (4 * CubeSize - 1 - pos.X);
-        }
+
+        nextPos = new Pos(transformedPos.X + targetFace.TopLeft2DPos.X, transformedPos.Y + targetFace.TopLeft2DPos.Y);
       }
 
       return (nextPos, nextDirection);
     }
 
-    public (Pos nextPos, Direction nextDirection) GetAdjacentPositionCube50(Pos pos, Direction direction)
+    private Pos RotatePosCounterClockwise(Pos pos)
     {
-      var nextPos = GetNextPosition(pos, direction);
-      var nextDirection = direction;
+      return new Pos(pos.Y, CubeSize - 1 - pos.X);
+    }
 
-      var offsetX = pos.X % CubeSize;
-      var offsetY = pos.Y % CubeSize;
+    private Direction RotateDirectionCounterClockwise(Direction direction)
+    {
+      return direction switch
+      {
+        Direction.Left => Direction.Down,
+        Direction.Down => Direction.Right,
+        Direction.Right => Direction.Up,
+        Direction.Up => Direction.Left,
+        _ => throw new ApplicationException()
+      };
+    }
 
+    private FaceVector RotateFaceVectorClockwise(FaceVector targetFaceVector)
+    {
+      var newX = targetFaceVector.Y;
+      var newY = Map.NegateVector(targetFaceVector.X);
+      return new FaceVector(targetFaceVector.NormalVector, newX, newY);
+    }
 
-      var face = GetFace(pos, true);
-      if (face == 1)
-      {
-        if (direction == Direction.Left && pos.IsBorder(direction, CubeSize))
-        {
-          nextDirection = Direction.Right;
-          nextPos = GetPosFromFace(4, true);
-          nextPos.Y += CubeSize - 1 - offsetY;
-        }
-        if (direction == Direction.Up && pos.IsBorder(direction, CubeSize))
-        {
-          nextDirection = Direction.Right;
-          nextPos = GetPosFromFace(6, true);
-          nextPos.Y += offsetX;
-        }
-      }
-      if (face == 2)
-      {
-        if (direction == Direction.Down && pos.IsBorder(direction, CubeSize))
-        {
-          nextDirection = Direction.Left;
-          nextPos = GetPosFromFace(3, true);
-          nextPos.X += CubeSize - 1;
-          nextPos.Y += offsetX;
-        }
-        if (direction == Direction.Up && pos.IsBorder(direction, CubeSize))
-        {
-          nextDirection = Direction.Up;
-          nextPos = GetPosFromFace(6, true);
-          nextPos.Y += CubeSize - 1;
-          nextPos.X += offsetX;
-        }
-        if (direction == Direction.Right && pos.IsBorder(direction, CubeSize))
-        {
-          nextDirection = Direction.Left;
-          nextPos = GetPosFromFace(5, true);
-          nextPos.X += CubeSize - 1;
-          nextPos.Y += CubeSize - 1 - offsetY;
-        }
-      }
-      if (face == 3)
-      {
-        if (direction == Direction.Left && pos.IsBorder(direction, CubeSize))
-        {
-          nextDirection = Direction.Down;
-          nextPos = GetPosFromFace(4, true);
-          nextPos.X += offsetY;
-        }
-        if (direction == Direction.Right && pos.IsBorder(direction, CubeSize))
-        {
-          nextDirection = Direction.Up;
-          nextPos = GetPosFromFace(2, true);
-          nextPos.X += offsetY;
-          nextPos.Y += CubeSize - 1;
-        }
-      }
-      if (face == 4)
-      {
-        if (direction == Direction.Up && pos.IsBorder(direction, CubeSize))
-        {
-          nextDirection = Direction.Right;
-          nextPos = GetPosFromFace(3, true);
-          nextPos.Y += offsetX;
-        }
-        if (direction == Direction.Left && pos.IsBorder(direction, CubeSize))
-        {
-          nextDirection = Direction.Right;
-          nextPos = GetPosFromFace(1, true);
-          nextPos.Y += CubeSize - 1 - offsetY;
-        }
-      }
-      if (face == 5)
-      {
-        if (direction == Direction.Down && pos.IsBorder(direction, CubeSize))
-        {
-          nextDirection = Direction.Left;
-          nextPos = GetPosFromFace(6, true);
-          nextPos.X += CubeSize - 1;
-          nextPos.Y += offsetX;
-        }
-        if (direction == Direction.Right && pos.IsBorder(direction, CubeSize))
-        {
-          nextDirection = Direction.Left;
-          nextPos = GetPosFromFace(2, true);
-          nextPos.X += CubeSize - 1;
-          nextPos.Y += CubeSize - 1 - offsetY;
-        }
-      }
-      if (face == 6)
-      {
-        if (direction == Direction.Right && pos.IsBorder(direction, CubeSize))
-        {
-          nextDirection = Direction.Up;
-          nextPos = GetPosFromFace(5, true);
-          nextPos.Y += CubeSize - 1;
-          nextPos.X += offsetY;
-        }
+    private CubeFace GetFaceAt(CubeSetup cubeSetup, Vector normalVector)
+    {
+      return cubeSetup.Faces[normalVector];
+    }
 
-        if (direction == Direction.Left && pos.IsBorder(direction, CubeSize))
-        {
-          nextDirection = Direction.Down;
-          nextPos = GetPosFromFace(1, true);
-          nextPos.X += offsetY;
-        }
+    private Pos GetLocalPos(Pos pos, CubeFace face)
+    {
+      return new Pos(pos.X - face.TopLeft2DPos.X, pos.Y - face.TopLeft2DPos.Y);
+    }
 
-        if (direction == Direction.Down && pos.IsBorder(direction, CubeSize))
-        {
-          nextDirection = Direction.Down;
-          nextPos = GetPosFromFace(2, true);
-          nextPos.X += offsetX;
-        }
-      }
-
-      return (nextPos, nextDirection);
+    private CubeFace GetFaceAt(CubeSetup cubeSetup, Pos pos)
+    {
+      return cubeSetup.Faces.Values.Where(f =>
+      pos.X >= f.TopLeft2DPos.X
+      && pos.Y >= f.TopLeft2DPos.Y
+      && pos.X < f.TopLeft2DPos.X + CubeSize
+      && pos.Y < f.TopLeft2DPos.Y + CubeSize
+      ).Single();
     }
 
     private Pos GetAdjacentPos(Pos pos, Direction direction)
@@ -422,7 +264,7 @@ namespace _22_MonkeyMap
     internal static Player GetFinalPlayer(string input, int cubeSize, bool useCube)
     {
       var inp = ParseInput(input, cubeSize);
-      var player = new Player(inp.Board);
+      var player = new Player(inp.Board, inp.Board.GetStartPosition());
       foreach (var instruction in inp.Instructions)
         player.DoInstruction(instruction, useCube);
       return player;
@@ -431,7 +273,7 @@ namespace _22_MonkeyMap
     internal static int GetFinalScore(string input, int cubeSize, bool useCube)
     {
       var inp = ParseInput(input, cubeSize);
-      var player = new Player(inp.Board);
+      var player = new Player(inp.Board, inp.Board.GetStartPosition());
       foreach (var instruction in inp.Instructions)
         player.DoInstruction(instruction, useCube);
 
@@ -559,16 +401,16 @@ namespace _22_MonkeyMap
       if (board.Field[topLeft2DPos.X, topLeft2DPos.Y] == Field.Empty)
         return;
 
-      faces.Add(faceVector.NormalVector, new CubeFace(topLeft2DPos));
+      faces.Add(faceVector.NormalVector, new CubeFace(topLeft2DPos, faceVector));
 
       foreach (var direction in Enum.GetValues<Direction>())
       {
-        var nextFaceVector = RotateNormalVector(faceVector, direction);
+        var nextFaceVector = RotateFaceVector(faceVector, direction);
         AddCubeFace(faces, topLeft2DPos.Move(direction, board.CubeSize), nextFaceVector, board);
       }
     }
 
-    private static FaceVector RotateNormalVector(FaceVector faceVector, Direction direction)
+    public static FaceVector RotateFaceVector(FaceVector faceVector, Direction direction)
     {
       return direction switch
       {
@@ -580,13 +422,13 @@ namespace _22_MonkeyMap
       };
     }
 
-    private static Vector NegateVector(Vector x)
+    public static Vector NegateVector(Vector x)
     {
       return new Vector(-x.X, -x.Y, -x.Z);
     }
   }
 
-  record CubeFace(Pos TopLeft2DPos);
+  record CubeFace(Pos TopLeft2DPos, FaceVector FaceVector);
 
   record struct Vector(int X, int Y, int Z);
 
