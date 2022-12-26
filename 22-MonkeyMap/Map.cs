@@ -39,54 +39,6 @@ namespace _22_MonkeyMap
 
   record Board(Field[,] Field, int CubeSize)
   {
-    internal int GetFace(Pos pos, bool useReal)
-    {
-      var positions = GetFacePositions(useReal);
-
-      foreach (var entry in positions)
-      {
-        if (pos.X >= entry.Value.X * CubeSize
-          && pos.X < (entry.Value.X + 1) * CubeSize
-          && pos.Y >= entry.Value.Y * CubeSize
-          && pos.Y < (entry.Value.Y + 1) * CubeSize
-          )
-        {
-          return entry.Key;
-        }
-      }
-
-      throw new ApplicationException("not expected");
-    }
-
-    private static Dictionary<int, Pos> GetFacePositions(bool useReal)
-    {
-      return useReal ?
-                new Dictionary<int, Pos>()
-      {
-        {1, new Pos(1, 0)},
-        {2, new Pos(2, 0)},
-        {3, new Pos(1, 1)},
-        {4, new Pos(0, 2)},
-        {5, new Pos(1, 2)},
-        {6, new Pos(0, 3)},
-      } :
-        new Dictionary<int, Pos>()
-      {
-        {1, new Pos(2, 0)},
-        {2, new Pos(0, 1)},
-        {3, new Pos(1, 1)},
-        {4, new Pos(2, 1)},
-        {5, new Pos(2, 2)},
-        {6, new Pos(3, 2)},
-      };
-    }
-
-    internal Pos GetPosFromFace(int face, bool useReal)
-    {
-      var pos = GetFacePositions(useReal)[face];
-      return new Pos(pos.X * CubeSize, pos.Y * CubeSize);
-    }
-
     internal Pos GetNextPosition(Pos pos, Direction direction)
     {
       var nextPos = GetAdjacentPos(pos, direction);
@@ -95,7 +47,7 @@ namespace _22_MonkeyMap
         nextPos = GetAdjacentPos(nextPos, direction);
 
       if (Field[nextPos.X, nextPos.Y] == _22_MonkeyMap.Field.Block)
-        return pos;
+        nextPos = pos;
 
       if (Field[nextPos.X, nextPos.Y] != _22_MonkeyMap.Field.Open)
         throw new ApplicationException("unexpected");
@@ -105,7 +57,11 @@ namespace _22_MonkeyMap
 
     internal Pos GetStartPosition()
     {
-      return GetNextPosition(new Pos(0, 0), Direction.Right);
+      var startPos = new Pos(0, 0);
+      while (Field[startPos.X, startPos.Y] == _22_MonkeyMap.Field.Empty)
+        startPos = startPos.Move(Direction.Right, 1);
+
+      return startPos;
     }
 
     internal (Pos pos, Direction direction) GetNextPositionCube(Pos pos, Direction direction, CubeSetup cubeSetup)
@@ -116,7 +72,10 @@ namespace _22_MonkeyMap
         throw new ApplicationException("not expected");
 
       if (Field[nextPos.X, nextPos.Y] == _22_MonkeyMap.Field.Block)
-        return (pos, direction);
+      {
+        nextPos = pos;
+        nextDirection = direction;
+      }
 
       if (Field[nextPos.X, nextPos.Y] != _22_MonkeyMap.Field.Open)
         throw new ApplicationException("unexpected");
@@ -164,31 +123,24 @@ namespace _22_MonkeyMap
       return new Pos(pos.Y, CubeSize - 1 - pos.X);
     }
 
-    private Direction RotateDirectionCounterClockwise(Direction direction)
+    private static Direction RotateDirectionCounterClockwise(Direction direction)
     {
-      return direction switch
-      {
-        Direction.Left => Direction.Down,
-        Direction.Down => Direction.Right,
-        Direction.Right => Direction.Up,
-        Direction.Up => Direction.Left,
-        _ => throw new ApplicationException()
-      };
+      return Player.GetNextDirection(direction, Direction.Left);
     }
 
-    private FaceVector RotateFaceVectorClockwise(FaceVector targetFaceVector)
+    private static FaceVector RotateFaceVectorClockwise(FaceVector targetFaceVector)
     {
       var newX = targetFaceVector.Y;
       var newY = Map.NegateVector(targetFaceVector.X);
       return new FaceVector(targetFaceVector.NormalVector, newX, newY);
     }
 
-    private CubeFace GetFaceAt(CubeSetup cubeSetup, Vector normalVector)
+    private static CubeFace GetFaceAt(CubeSetup cubeSetup, Vector normalVector)
     {
       return cubeSetup.Faces[normalVector];
     }
 
-    private Pos GetLocalPos(Pos pos, CubeFace face)
+    private static Pos GetLocalPos(Pos pos, CubeFace face)
     {
       return new Pos(pos.X - face.TopLeft2DPos.X, pos.Y - face.TopLeft2DPos.Y);
     }
@@ -272,11 +224,7 @@ namespace _22_MonkeyMap
 
     internal static int GetFinalScore(string input, int cubeSize, bool useCube)
     {
-      var inp = ParseInput(input, cubeSize);
-      var player = new Player(inp.Board, inp.Board.GetStartPosition());
-      foreach (var instruction in inp.Instructions)
-        player.DoInstruction(instruction, useCube);
-
+      var player = GetFinalPlayer(input, cubeSize, useCube);
       return player.GetScore();
     }
 

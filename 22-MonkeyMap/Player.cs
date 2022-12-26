@@ -5,18 +5,6 @@
     public int X { get; set; } = X;
     public int Y { get; set; } = Y;
 
-    internal bool IsBorder(Direction direction, int cubeSize)
-    {
-      return direction switch
-      {
-        Direction.Up when Y % cubeSize == 0 => true,
-        Direction.Left when X % cubeSize == 0 => true,
-        Direction.Down when (Y + 1) % cubeSize == 0 => true,
-        Direction.Right when (X + 1) % cubeSize == 0 => true,
-        _ => false
-      };
-    }
-
     internal bool IsLocalBorder(Direction direction, int cubeSize)
     {
       return direction switch
@@ -56,8 +44,8 @@
 
   internal class Player
   {
-    private Board board;
-    private CubeSetup cubeSetup;
+    private readonly Board board;
+    private readonly CubeSetup cubeSetup;
 
     public Player(Board board, Pos pos)
     {

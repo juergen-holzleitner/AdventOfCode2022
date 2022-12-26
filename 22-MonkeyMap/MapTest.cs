@@ -101,7 +101,6 @@ namespace _22_MonkeyMap
     public void Can_turn_into_direction(Direction currentDirection, Direction turnDirection, Direction expectedDirection)
     {
       var newDirection = Player.GetNextDirection(currentDirection, turnDirection);
-
       newDirection.Should().Be(expectedDirection);
     }
 
@@ -133,24 +132,6 @@ namespace _22_MonkeyMap
       score.Should().Be(6032);
     }
 
-    [Theory]
-    [InlineData(8, 0, 1)]
-    [InlineData(0, 7, 2)]
-    [InlineData(7, 4, 3)]
-    [InlineData(8, 4, 4)]
-    [InlineData(8, 8, 5)]
-    [InlineData(15, 11, 6)]
-    public void Can_get_map_face(int X, int Y, int expectedFace)
-    {
-      var input = "        ...#\r\n        .#..\r\n        #...\r\n        ....\r\n...#.......#\r\n........#...\r\n..#....#....\r\n..........#.\r\n        ...#....\r\n        .....#..\r\n        .#......\r\n        ......#.\r\n\r\n10R5L5R10L4R5L5\r\n";
-      var inp = Map.ParseInput(input, 4);
-      var pos = new Pos(X, Y);
-
-      var face = inp.Board.GetFace(pos, false);
-
-      face.Should().Be(expectedFace);
-    }
-
     [Fact]
     public void Can_get_final_player_cube()
     {
@@ -173,10 +154,10 @@ namespace _22_MonkeyMap
     {
       var text = "        ...#\r\n        .#..\r\n        #...\r\n        ....\r\n...#.......#\r\n........#...\r\n..#....#....\r\n..........#.\r\n        ...#....\r\n        .....#..\r\n        .#......\r\n        ......#.\r\n\r\n10R5L5R10L4R5L5\r\n";
       var input = Map.ParseInput(text, 4);
-      var player = new Player(input.Board, input.Board.GetStartPosition());
-      player.Pos.Should().Be(new Pos(8, 0));
+      var startPos = input.Board.GetStartPosition();
+      startPos.Should().Be(new Pos(8, 0));
 
-      var cubeSetup = Map.FoldToCube(input.Board, player.Pos);
+      var cubeSetup = Map.FoldToCube(input.Board, startPos);
       cubeSetup.Faces.Should().Contain(f => f.Key == new Vector(0, 1, 0) && f.Value.TopLeft2DPos == new Pos(8, 0)); // top
       cubeSetup.Faces.Should().Contain(f => f.Key == new Vector(0, 0, -1) && f.Value.TopLeft2DPos == new Pos(8, 4)); // front
       cubeSetup.Faces.Should().Contain(f => f.Key == new Vector(0, 0, 1) && f.Value.TopLeft2DPos == new Pos(0, 4)); // back
