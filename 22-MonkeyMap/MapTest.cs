@@ -183,6 +183,20 @@ namespace _22_MonkeyMap
       cubeSetup.Faces.Should().Contain(f => f.Key == new Vector(1, 0, 0) && f.Value.TopLeft2DPos == new Pos(8, 0)); // right
     }
 
+    /*
+          1111
+          1111
+          1111
+          1111
+    222233334444
+    222233334444
+    222233334444
+    222233334444
+          55556666
+          55556666
+          55556666
+          55556666
+    */
     [Theory]
     [InlineData(8, 0, Direction.Right, 9, 0, Direction.Right)]
     [InlineData(8, 3, Direction.Down, 8, 4, Direction.Down)]
@@ -214,6 +228,24 @@ namespace _22_MonkeyMap
       nextDirection.Should().Be(expectedDirection);
     }
 
+    /*
+        11112222
+        11112222
+        11112222
+        11112222
+        3333
+        3333
+        3333
+        3333
+    44445555
+    44445555
+    44445555
+    44445555
+    6666
+    6666
+    6666
+    6666
+    */
     [Theory]
     [InlineData(4, 4, Direction.Left, 0, 8, Direction.Down)] // 3 left
     [InlineData(3, 8, Direction.Up, 4, 7, Direction.Right)] // 4 up
